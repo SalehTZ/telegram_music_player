@@ -51,6 +51,17 @@ class AppSize {
   static const double s162 = 162.0;
 }
 
+class AppGap {
+  static const w4 = SizedBox(width: AppSize.s4);
+  static const w8 = SizedBox(width: AppSize.s8);
+  static const w12 = SizedBox(width: AppSize.s12);
+  static const w16 = SizedBox(width: AppSize.s18);
+  static const h4 = SizedBox(height: AppSize.s4);
+  static const h8 = SizedBox(height: AppSize.s8);
+  static const h12 = SizedBox(height: AppSize.s12);
+  static const h16 = SizedBox(height: AppSize.s16);
+}
+
 class AppRadius {
   static const rad8 = Radius.circular(8);
   static const rad12 = Radius.circular(12);
