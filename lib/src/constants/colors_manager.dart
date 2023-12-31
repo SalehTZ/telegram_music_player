@@ -5,10 +5,7 @@ class ColorManager {
   static const Color error = Colors.red; // TODO change error color later
   static const Color scaffoldBgColor = Color(0xFFF5F5F5);
   static const Color likeButtonColor = Color(0xFFFE3B7C);
-  static const Color splashScreenBgColor = Color(0xFF6C5FBC);
-  static const Color bottomSheetHandleColor = Color(0xFFEEEEEE);
-  static const Color customTruckStatusOpenColor = Color(0xFF3EA400);
-  static const Color customTruckStatusCloseColor = Color(0xFFFE3A7C);
+  static const Color white = Colors.white;
 
   //* Primary Colors
   static Color primaryMaterial = HexColor.toMaterialColor(0xFF5947B2);
