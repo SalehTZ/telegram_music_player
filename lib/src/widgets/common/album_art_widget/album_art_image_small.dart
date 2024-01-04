@@ -1,11 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../../constants/values_manager.dart';
+import '../../../constants/values_manager.dart';
 
-class LargeAlbumArtImage extends StatelessWidget {
+class SmallAlbumArtImage extends StatelessWidget {
   final Uint8List imageData;
-  const LargeAlbumArtImage({
+  const SmallAlbumArtImage({
     super.key,
     required this.imageData,
   });
@@ -14,13 +14,13 @@ class LargeAlbumArtImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        borderRadius: BorderRadius.all(AppRadius.rad12),
+        borderRadius: BorderRadius.all(AppRadius.rad8),
       ),
       // TODO if imageData was null show default image
       child: Image.memory(
         imageData,
-        width: AppSize.s162,
-        height: AppSize.s162,
+        width: AppSize.s84,
+        height: AppSize.s84,
       ),
     );
   }
