@@ -49,6 +49,7 @@ class AppSize {
   static const double s86 = 86.0;
   static const double s90 = 90.0;
   static const double s162 = 162.0;
+  static const double s390 = 390.0;
 }
 
 class AppGap {
