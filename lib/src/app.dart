@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'blocs/audio_player/audio_player_bloc.dart';
+import 'constants/themes_manager.dart';
 import 'screens/home_screen/home_screen.dart';
 
 class MusicPlayerApp extends StatelessWidget {
@@ -8,8 +11,13 @@ class MusicPlayerApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       navigatorKey: GlobalKey<NavigatorState>(),
-      home: const HomeScreen(),
+      theme: ThemesManager.nightTheme,
+      home: BlocProvider(
+        create: (context) => AudioPlayerBloc(),
+        child: const HomeScreen(),
+      ),
     );
   }
 }
