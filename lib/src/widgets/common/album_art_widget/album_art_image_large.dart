@@ -1,10 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:telegram_music_player/src/constants/assets_manager.dart';
 
 import '../../../constants/values_manager.dart';
 
 class LargeAlbumArtImage extends StatelessWidget {
-  final Uint8List imageData;
+  final Uint8List? imageData;
   const LargeAlbumArtImage({
     super.key,
     required this.imageData,
@@ -16,12 +17,20 @@ class LargeAlbumArtImage extends StatelessWidget {
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.all(AppRadius.rad12),
       ),
-      // TODO if imageData was null show default image
-      child: Image.memory(
-        imageData,
-        width: AppSize.s162,
-        height: AppSize.s162,
-      ),
+      child: imageData == null
+          ? ClipRRect(
+              borderRadius: const BorderRadius.all(AppRadius.rad12),
+              child: Image.asset(
+                AssetsManager.defaultSongThumbnail,
+                width: AppSize.s162,
+                height: AppSize.s162,
+              ),
+            )
+          : Image.memory(
+              imageData!,
+              width: AppSize.s162,
+              height: AppSize.s162,
+            ),
     );
   }
 }
