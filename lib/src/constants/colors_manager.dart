@@ -3,9 +3,14 @@ import 'package:flutter/material.dart';
 class ColorManager {
   //! New Color Scheme
   static const Color error = Colors.red; // TODO change error color later
-  static const Color scaffoldBgColor = Color(0xFFF5F5F5);
-  static const Color likeButtonColor = Color(0xFFFE3B7C);
+  static const Color transparent = Colors.transparent;
   static const Color white = Colors.white;
+  static const Color lightGrey = Color(0xffc1c1c1);
+  static const Color searchBarBackground = Color(0xff191919);
+  static const Color backgroundColor = Color(0xFF121212);
+  static const Color scaffoldBgColor = backgroundColor;
+  static const Color appBarBgColor = backgroundColor;
+  static const Color likeButtonColor = Color(0xFFFE3B7C);
 
   //* Primary Colors
   static Color primaryMaterial = HexColor.toMaterialColor(0xFF5947B2);
