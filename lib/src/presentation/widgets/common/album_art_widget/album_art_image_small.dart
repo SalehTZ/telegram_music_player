@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../../../constants/values_manager.dart';
+import '../../../../constants/values_manager.dart';
 
 class SmallAlbumArtImage extends StatelessWidget {
   final Uint8List imageData;

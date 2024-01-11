@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../constants/assets_manager.dart';
-import '../../constants/styles_manager.dart';
-import '../../constants/values_manager.dart';
+import '../../../constants/assets_manager.dart';
+import '../../../constants/styles_manager.dart';
+import '../../../constants/values_manager.dart';
 import '../common/round_button/round_button_widget.dart';
 
 class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {

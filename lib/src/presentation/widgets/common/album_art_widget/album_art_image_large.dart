@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:telegram_music_player/src/constants/assets_manager.dart';
 
-import '../../../constants/values_manager.dart';
+import '../../../../constants/assets_manager.dart';
+import '../../../../constants/values_manager.dart';
 
 class LargeAlbumArtImage extends StatelessWidget {
   final Uint8List? imageData;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../constants/values_manager.dart';
+import '../../../../constants/values_manager.dart';
 
 class CustomListBuilder extends StatelessWidget {
   const CustomListBuilder({

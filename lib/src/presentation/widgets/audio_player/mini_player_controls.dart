@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../constants/colors_manager.dart';
-import '../../constants/values_manager.dart';
+import '../../../constants/colors_manager.dart';
+import '../../../constants/values_manager.dart';
 
 class MiniPlayerControls extends StatelessWidget {
   const MiniPlayerControls({super.key});

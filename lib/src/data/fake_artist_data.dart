@@ -1,4 +1,4 @@
-import 'package:telegram_music_player/src/models/artist_model.dart';
+import 'models/artist_model.dart';
 
 var fakeArtistsList = [
   Artist(

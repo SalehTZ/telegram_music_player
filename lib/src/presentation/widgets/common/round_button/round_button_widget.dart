@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../../../constants/colors_manager.dart';
-import '../../../constants/values_manager.dart';
+import '../../../../constants/colors_manager.dart';
+import '../../../../constants/values_manager.dart';
 
 class RoundButtonWidget extends StatelessWidget {
   final String svgIcon;

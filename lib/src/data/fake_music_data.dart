@@ -1,4 +1,4 @@
-import '../models/song_model.dart';
+import 'models/song_model.dart';
 
 var fakeSongsList = [
   Song(

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../constants/fonts_manager.dart';
-import '../../constants/styles_manager.dart';
-import '../../constants/values_manager.dart';
-import '../../data/fake_artist_data.dart';
-import '../../data/fake_music_data.dart';
+import '../../../constants/fonts_manager.dart';
+import '../../../constants/styles_manager.dart';
+import '../../../constants/values_manager.dart';
+import '../../../data/fake_artist_data.dart';
+import '../../../data/fake_music_data.dart';
 import '../../widgets/appbar/appbar_widget.dart';
 import '../../widgets/artist_thumbnail/artist_thumbnail_widget.dart';
 import '../../widgets/common/custom_list_builder/custom_list_builder.dart';

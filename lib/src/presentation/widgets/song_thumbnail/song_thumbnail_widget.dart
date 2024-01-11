@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../constants/fonts_manager.dart';
-import '../../constants/styles_manager.dart';
-import '../../constants/values_manager.dart';
-import '../../models/song_model.dart';
+import '../../../constants/fonts_manager.dart';
+import '../../../constants/styles_manager.dart';
+import '../../../constants/values_manager.dart';
+import '../../../data/models/song_model.dart';
 import '../common/album_art_widget/album_art_image_large.dart';
 
 class SongThumbnailWidget extends StatelessWidget {
