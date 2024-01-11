@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'blocs/audio_player/audio_player_bloc.dart';
 import 'constants/themes_manager.dart';
-import 'screens/home_screen/home_screen.dart';
+import 'presentation/screens/home_screen/home_screen.dart';
 
 class MusicPlayerApp extends StatelessWidget {
   const MusicPlayerApp({super.key});
