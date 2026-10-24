@@ -55,6 +55,7 @@ import io.flutter.plugin.common.MethodChannel;
 public class MainActivity extends AudioServiceActivity {
     private static final int REQUEST_PERMISSION = 1;
     private static final int REQUEST_WRITE = 2;
+    private static final int REQUEST_DELETE = 3;
 
     // A few threads, so covers keep loading while a song is saved
     private final ExecutorService worker = Executors.newFixedThreadPool(3);
@@ -62,6 +63,7 @@ public class MainActivity extends AudioServiceActivity {
     private MethodChannel channel;
     private MethodChannel.Result permissionResult;
     private MethodChannel.Result writeResult;
+    private MethodChannel.Result deleteResult;
 
     // Songs shared to Stash, until the Dart side takes them
     private final List<String> imported = new ArrayList<>();
@@ -113,6 +115,9 @@ public class MainActivity extends AudioServiceActivity {
                 break;
             case "requestWriteAccess":
                 requestWriteAccess(call.argument("uris"), result);
+                break;
+            case "delete":
+                delete(call.argument("uris"), call.argument("paths"), result);
                 break;
             case "writeFile":
                 writeFile(call.argument("uri"), call.argument("path"), call.argument("source"),
@@ -253,9 +258,56 @@ public class MainActivity extends AudioServiceActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_DELETE && deleteResult != null) {
+            deleteResult.success(resultCode == RESULT_OK);
+            deleteResult = null;
+            return;
+        }
         if (requestCode != REQUEST_WRITE || writeResult == null) return;
         writeResult.success(resultCode == RESULT_OK);
         writeResult = null;
+    }
+
+    // ---- Deleting songs
+
+    /**
+     * Android 11 and later delete the files once the user says OK in a system
+     * dialog. Before that the storage permission covers it.
+     */
+    private void delete(List<String> uris, List<String> paths, MethodChannel.Result result) {
+        if (uris == null || uris.isEmpty()) {
+            result.success(true);
+            return;
+        }
+        if (Build.VERSION.SDK_INT >= 30) {
+            List<Uri> parsed = new ArrayList<>();
+            for (String uri : uris) parsed.add(Uri.parse(uri));
+            PendingIntent request = MediaStore.createDeleteRequest(getContentResolver(), parsed);
+            try {
+                deleteResult = result;
+                startIntentSenderForResult(request.getIntentSender(), REQUEST_DELETE, null, 0, 0, 0);
+            } catch (IntentSender.SendIntentException e) {
+                deleteResult = null;
+                result.error("delete_request", e.getMessage(), null);
+            }
+            return;
+        }
+        worker.execute(() -> {
+            try {
+                for (int i = 0; i < uris.size(); i++) {
+                    if (getContentResolver().delete(Uri.parse(uris.get(i)), null, null) == 0) {
+                        // The library may not know the file; take it off the disk directly
+                        File file = new File(paths.get(i));
+                        if (file.exists() && !file.delete()) {
+                            throw new IOException("Couldn't delete " + file.getName());
+                        }
+                    }
+                }
+                main.post(() -> result.success(true));
+            } catch (Exception e) {
+                main.post(() -> result.error("delete", e.getMessage(), null));
+            }
+        });
     }
 
     /**

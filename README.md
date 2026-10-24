@@ -57,6 +57,10 @@ them and cleans them up.
   MP3, FLAC, Ogg Vorbis, Opus and M4A. Stash writes the tags itself and keeps
   the ones it doesn't know about. When the new tags fit in the old space,
   only the tags are written and the audio is never touched.
+- **Duplicates.** The same song saved from three channels? Stash groups the
+  copies, keeps the best one (lossless first, then the higher bitrate) and
+  deletes the rest after one OK. Favorites and playlists move to the copy
+  you keep.
 - **Covers and lyrics.** Find a cover on iTunes or Deezer, and lyrics on
   LRCLIB, time-synced line by line when it has them. Save either into the
   song.

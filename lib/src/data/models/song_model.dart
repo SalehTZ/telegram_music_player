@@ -47,6 +47,10 @@ class Song {
   /// Stash can rewrite the tags of MP3, FLAC, Ogg, Opus and M4A files.
   bool get canEditTags => editableFormats.contains(format);
 
+  /// Average bitrate in kbps, from the file size, tags included.
+  int get bitrate =>
+      duration.inMilliseconds == 0 ? 0 : size * 8 ~/ duration.inMilliseconds;
+
   String get folder {
     final slash = path.lastIndexOf('/');
     return slash <= 0 ? '/' : path.substring(0, slash);
