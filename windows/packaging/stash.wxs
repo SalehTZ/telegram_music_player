@@ -10,7 +10,7 @@
     <MajorUpgrade DowngradeErrorMessage="A newer version of Stash is already installed." />
     <MediaTemplate EmbedCab="yes" />
 
-    <Icon Id="StashIcon" SourceFile="..\runner\resources\app_icon.ico" />
+    <Icon Id="StashIcon" SourceFile="$(sys.SOURCEFILEDIR)..\runner\resources\app_icon.ico" />
     <Property Id="ARPPRODUCTICON" Value="StashIcon" />
     <Property Id="ARPURLINFOABOUT" Value="https://github.com/SalehTZ/Stash" />
 
