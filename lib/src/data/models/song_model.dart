@@ -38,6 +38,10 @@ class Song {
     return path.substring(dot + 1).toUpperCase();
   }
 
+  /// What favorites, history and playlists remember the song by. Unlike
+  /// [id] it means the same file on every platform and after a rescan.
+  String get key => path;
+
   /// Stash can only rewrite the tags of MP3 files.
   bool get canEditTags => format == 'MP3';
 

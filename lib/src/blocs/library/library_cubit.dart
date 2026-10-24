@@ -30,16 +30,44 @@ class LibraryCubit extends Cubit<LibraryState> {
 
   Future<void> start() async {
     final saved = await store.load();
-    emit(state.copyWith(
-      favorites: (saved['favorites'] as List?)?.cast<int>(),
-      history: (saved['history'] as List?)?.cast<int>(),
-      playlists: [
-        for (final p in (saved['playlists'] as List? ?? const []).cast<Map>())
-          Playlist(p['name'] as String, (p['songs'] as List).cast<int>()),
-      ],
-    ));
+    // * Stash 0.2 and older saved media ids, which only make sense once the
+    // * songs are loaded
+    if (_savesIds(saved)) {
+      _legacy = saved;
+    } else {
+      emit(_restore(saved, (key) => key as String));
+    }
     _imports = library.imports.listen(_onImported);
     await refresh();
+  }
+
+  Map<String, Object?>? _legacy;
+
+  static bool _savesIds(Map<String, Object?> saved) => [
+        ...(saved['favorites'] as List? ?? const []),
+        ...(saved['history'] as List? ?? const []),
+        for (final p in (saved['playlists'] as List? ?? const []).cast<Map>())
+          ...(p['songs'] as List),
+      ].any((key) => key is int);
+
+  /// [saved] read into the state, each song turned into its key by [keyOf],
+  /// which gives null for a song that's gone.
+  LibraryState _restore(
+    Map<String, Object?> saved,
+    String? Function(Object? key) keyOf,
+  ) {
+    List<String> keys(Object? list) => [
+          for (final key in (list as List? ?? const []))
+            if (keyOf(key) case final key?) key
+        ];
+    return state.copyWith(
+      favorites: keys(saved['favorites']),
+      history: keys(saved['history']),
+      playlists: [
+        for (final p in (saved['playlists'] as List? ?? const []).cast<Map>())
+          Playlist(p['name'] as String, keys(p['songs'])),
+      ],
+    );
   }
 
   /// Loads the songs again, or waits for the permission while it's missing.
@@ -53,6 +81,11 @@ class LibraryCubit extends Cubit<LibraryState> {
       }
       final songs = await library.songs();
       emit(state.copyWith(status: LibraryStatus.ready, songs: songs));
+      if (_legacy case final legacy?) {
+        _legacy = null;
+        final keys = {for (final s in songs) s.id: s.key};
+        _change(_restore(legacy, (id) => keys[id]));
+      }
     } on PlatformException {
       emit(state.copyWith(status: LibraryStatus.failed));
     }
@@ -73,14 +106,14 @@ class LibraryCubit extends Cubit<LibraryState> {
 
   void toggleFavorite(Song song) => _change(state.copyWith(
         favorites: state.isFavorite(song)
-            ? [...state.favorites.where((id) => id != song.id)]
-            : [...state.favorites, song.id],
+            ? [...state.favorites.where((key) => key != song.key)]
+            : [...state.favorites, song.key],
       ));
 
   void markPlayed(Song song) => _change(state.copyWith(
         history: [
-          song.id,
-          ...state.history.where((id) => id != song.id).take(99),
+          song.key,
+          ...state.history.where((key) => key != song.key).take(99),
         ],
       ));
 
@@ -91,7 +124,7 @@ class LibraryCubit extends Cubit<LibraryState> {
     for (var n = 2; state.playlists.any((p) => p.name == unique); n++) {
       unique = '${name.trim()} $n';
     }
-    final playlist = Playlist(unique, [if (first != null) first.id]);
+    final playlist = Playlist(unique, [if (first != null) first.key]);
     _change(state.copyWith(playlists: [...state.playlists, playlist]));
     return playlist;
   }
@@ -102,17 +135,17 @@ class LibraryCubit extends Cubit<LibraryState> {
 
   void addToPlaylist(Playlist playlist, Song song) =>
       _replacePlaylist(playlist, [
-        ...playlist.songIds.where((id) => id != song.id),
-        song.id,
+        ...playlist.songKeys.where((key) => key != song.key),
+        song.key,
       ]);
 
   void removeFromPlaylist(Playlist playlist, Song song) => _replacePlaylist(
-      playlist, [...playlist.songIds.where((id) => id != song.id)]);
+      playlist, [...playlist.songKeys.where((key) => key != song.key)]);
 
-  void _replacePlaylist(Playlist playlist, List<int> songIds) =>
+  void _replacePlaylist(Playlist playlist, List<String> songKeys) =>
       _change(state.copyWith(playlists: [
         for (final p in state.playlists)
-          p == playlist ? Playlist(p.name, songIds) : p,
+          p == playlist ? Playlist(p.name, songKeys) : p,
       ]));
 
   void _change(LibraryState next) {
