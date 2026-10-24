@@ -4,6 +4,7 @@ import '../../../constants/assets_manager.dart';
 import '../../../constants/fonts_manager.dart';
 import '../../../constants/styles_manager.dart';
 import '../../../constants/values_manager.dart';
+import '../common/logo/stash_mark.dart';
 import '../common/round_button/round_button_widget.dart';
 
 class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
@@ -35,9 +36,16 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
                     svgIcon: AssetsManager.arrowBackIcon,
                     onTap: () => Navigator.of(context).maybePop(),
                   ),
-            Text(
-              "logo",
-              style: TextStyles.getBoldStyle(fontSize: FontSize.s24),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const StashMark(size: AppSize.s28),
+                AppGap.w8,
+                Text(
+                  "Stash",
+                  style: TextStyles.getBoldStyle(fontSize: FontSize.s24),
+                ),
+              ],
             ),
             if (hasSecondAction)
               RoundButtonWidget(

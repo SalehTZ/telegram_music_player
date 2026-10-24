@@ -8,8 +8,11 @@ import '../../../constants/colors_manager.dart';
 import '../../../constants/fonts_manager.dart';
 import '../../../constants/styles_manager.dart';
 import '../../../constants/values_manager.dart';
+import '../common/logo/stash_mark.dart';
 
 enum DrawerPage { home, folders, playlists, songs }
+
+const _version = String.fromEnvironment('APP_VERSION');
 
 class AppDrawer extends StatelessWidget {
   final ValueChanged<DrawerPage> onPageSelected;
@@ -36,14 +39,22 @@ class AppDrawer extends StatelessWidget {
                 children: [
                   AppGap.h48,
                   // * Logo
-                  Text(
-                    "logo",
-                    style: TextStyles.getBoldStyle(fontSize: FontSize.s36),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const StashMark(size: AppSize.s40),
+                      AppGap.w12,
+                      Text(
+                        "Stash",
+                        style: TextStyles.getBoldStyle(fontSize: FontSize.s36),
+                      ),
+                    ],
                   ),
 
                   AppGap.h114,
                   // * Navigation items
-                  Padding(
+                  Container(
+                    alignment: AlignmentDirectional.centerStart,
                     padding: const EdgeInsets.only(left: AppPadding.p40),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,11 +87,12 @@ class AppDrawer extends StatelessWidget {
                   ),
 
                   const Spacer(),
-                  // * App version
-                  Text(
-                    "version 1.0.0:21",
-                    style: TextStyles.getRegularStyle(),
-                  ),
+                  // * App version, set by the release build
+                  if (_version.isNotEmpty)
+                    Text(
+                      "version $_version",
+                      style: TextStyles.getRegularStyle(),
+                    ),
                   AppGap.h8,
                 ],
               ),

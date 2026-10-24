@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../constants/colors_manager.dart';
 import '../../../constants/values_manager.dart';
 import '../../../data/models/song_model.dart';
-import '../common/album_art_widget/album_art_image_small.dart';
+import '../common/artwork/artwork_image.dart';
 import 'mini_player_controls.dart';
 
 class MiniPlayer extends StatelessWidget {
@@ -47,7 +47,7 @@ class MiniPlayer extends StatelessWidget {
               padding: const EdgeInsets.all(AppPadding.p8),
               child: Row(
                 children: [
-                  SmallAlbumArtImage(imageData: song.albumArtUrl),
+                  ArtworkImage(song: song, size: AppSize.s84),
                   AppGap.w8,
                   Expanded(
                     child: MiniPlayerControls(

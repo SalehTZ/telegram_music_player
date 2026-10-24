@@ -21,17 +21,13 @@ jobs:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
-
-      # assets/audio is listed in pubspec.yaml but its contents are git-ignored.
-      - name: Create git-ignored asset folder
-        run: mkdir -p assets/audio
 
       - name: Install dependencies
         run: flutter pub get
@@ -50,9 +46,9 @@ jobs:
     needs: check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
@@ -63,18 +59,16 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Create git-ignored asset folder
-        run: mkdir -p assets/audio
-
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build APK
-        run: flutter build apk --release
+      # Same split as the release workflow, signed with the debug key.
+      - name: Build APKs
+        run: flutter build apk --release --split-per-abi
 
-      - name: Upload APK
+      - name: Upload APKs
         uses: actions/upload-artifact@v4
         with:
-          name: telegram-music-player-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          name: stash-apks
+          path: build/app/outputs/flutter-apk/app-*-release.apk
           retention-days: 14

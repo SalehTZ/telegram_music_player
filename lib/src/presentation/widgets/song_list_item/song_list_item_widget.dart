@@ -2,22 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../constants/assets_manager.dart';
+import '../../../constants/colors_manager.dart';
 import '../../../constants/fonts_manager.dart';
 import '../../../constants/styles_manager.dart';
 import '../../../constants/values_manager.dart';
 import '../../../data/models/song_model.dart';
 import '../../../utils/duration_extension.dart';
-import '../common/album_art_widget/album_art_image_small.dart';
+import '../common/artwork/artwork_image.dart';
 
 class SongListItemWidget extends StatelessWidget {
   final Song song;
   final VoidCallback? onTap;
   final VoidCallback? onMenuTap;
+
+  /// The song that is playing, shown with its title in the accent colour.
+  final bool isCurrent;
   const SongListItemWidget({
     super.key,
     required this.song,
     this.onTap,
     this.onMenuTap,
+    this.isCurrent = false,
   });
 
   @override
@@ -29,7 +34,7 @@ class SongListItemWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // * Album art
-          SmallAlbumArtImage(imageData: song.albumArtUrl),
+          ArtworkImage(song: song, size: AppSize.s84),
 
           AppGap.w12,
           // * Song name and artist
@@ -43,11 +48,16 @@ class SongListItemWidget extends StatelessWidget {
                     song.title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyles.getSemiBoldStyle(fontSize: FontSize.s18),
+                    style: TextStyles.getSemiBoldStyle(
+                      fontSize: FontSize.s18,
+                      color: isCurrent
+                          ? ColorManager.primaryPressedColor
+                          : ColorManager.white,
+                    ),
                   ),
                   AppGap.h16,
                   Text(
-                    song.artist,
+                    song.artistOrUnknown,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyles.getRegularStyle(fontSize: FontSize.s14),

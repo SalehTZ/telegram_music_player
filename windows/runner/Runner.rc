@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "telegram_music_player" "\0"
+            VALUE "CompanyName", "SalehTZ" "\0"
+            VALUE "FileDescription", "Stash" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "telegram_music_player" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2023 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "telegram_music_player.exe" "\0"
-            VALUE "ProductName", "telegram_music_player" "\0"
+            VALUE "InternalName", "stash" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2023 SalehTZ. All rights reserved." "\0"
+            VALUE "OriginalFilename", "stash.exe" "\0"
+            VALUE "ProductName", "Stash" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
