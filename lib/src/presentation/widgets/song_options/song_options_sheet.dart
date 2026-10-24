@@ -162,7 +162,7 @@ class _SongOptionsSheet extends StatelessWidget {
                 page.pop();
                 openSongList(
                   page.context,
-                  title: song.folder.split('/').last,
+                  title: Song.folderName(song.folder),
                   select: (s) => [
                     for (final f in s.folders)
                       if (f.name == song.folder) ...f.songs,

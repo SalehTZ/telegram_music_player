@@ -173,7 +173,7 @@ class _EditTagsScreenState extends State<EditTagsScreen> {
               children: [
                 PageTitle(
                   title: song.canEditTags ? 'Edit tags' : 'Tags',
-                  subtitle: song.path.split('/').last,
+                  subtitle: song.fileName,
                 ),
                 if (!song.canEditTags) ...[
                   AppGap.h16,
