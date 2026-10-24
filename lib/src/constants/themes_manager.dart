@@ -1,4 +1,7 @@
+import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:flutter/material.dart';
+
+import '../presentation/motion.dart';
 
 import 'colors_manager.dart';
 import 'fonts_manager.dart';
@@ -19,6 +22,17 @@ class ThemesManager {
     brightness: Brightness.dark,
     fontFamily: FontConstants.fontFamily,
     scaffoldBackgroundColor: ColorManager.scaffoldBgColor,
+    // * iOS keeps its own slide, and with it the swipe back
+    pageTransitionsTheme: const PageTransitionsTheme(
+      builders: {
+        TargetPlatform.android: StashPageTransitionsBuilder(),
+        TargetPlatform.fuchsia: StashPageTransitionsBuilder(),
+        TargetPlatform.linux: StashPageTransitionsBuilder(),
+        TargetPlatform.windows: StashPageTransitionsBuilder(),
+        TargetPlatform.macOS: StashPageTransitionsBuilder(),
+        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+      },
+    ),
     colorScheme: const ColorScheme.dark(
       primary: ColorManager.primaryEnabledColor,
       onPrimary: ColorManager.white,

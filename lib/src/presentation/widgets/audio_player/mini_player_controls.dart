@@ -7,6 +7,7 @@ import '../../../constants/fonts_manager.dart';
 import '../../../constants/styles_manager.dart';
 import '../../../constants/values_manager.dart';
 import '../../../data/models/song_model.dart';
+import '../../motion.dart';
 import '../common/progress_bar/song_progress_bar.dart';
 
 class MiniPlayerControls extends StatelessWidget {
@@ -33,28 +34,32 @@ class MiniPlayerControls extends StatelessWidget {
           children: [
             // * Song name and artist
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    song.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyles.getMediumStyle(fontSize: FontSize.s15),
-                  ),
-                  AppGap.h4,
-                  Text(
-                    song.artistOrUnknown,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyles.getRegularStyle(
-                      color: ColorManager.miniPlayerSubtitle,
-                      height: FontHeight.h1_4,
-                      letterSpacing: FontLetterSpacing.none,
+              child: MotionSwitcher(
+                alignment: AlignmentDirectional.centerStart,
+                child: Column(
+                  key: ValueKey(song.id),
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      song.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyles.getMediumStyle(fontSize: FontSize.s15),
                     ),
-                  ),
-                ],
+                    AppGap.h4,
+                    Text(
+                      song.artistOrUnknown,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyles.getRegularStyle(
+                        color: ColorManager.miniPlayerSubtitle,
+                        height: FontHeight.h1_4,
+                        letterSpacing: FontLetterSpacing.none,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
 
@@ -65,21 +70,28 @@ class MiniPlayerControls extends StatelessWidget {
                 children: [
                   _MiniPlayerButton(
                     onTap: onPlayPause,
-                    child: isPlaying
-                        ? SvgPicture.asset(
-                            AssetsManager.pauseIcon,
-                            width: AppSize.s24,
-                            height: AppSize.s24,
-                            colorFilter: const ColorFilter.mode(
-                              ColorManager.white,
-                              BlendMode.srcIn,
+                    child: MotionSwitcher(
+                      rise: 0,
+                      scale: 0.6,
+                      duration: Motion.hover,
+                      child: isPlaying
+                          ? SvgPicture.asset(
+                              key: const ValueKey(true),
+                              AssetsManager.pauseIcon,
+                              width: AppSize.s24,
+                              height: AppSize.s24,
+                              colorFilter: const ColorFilter.mode(
+                                ColorManager.white,
+                                BlendMode.srcIn,
+                              ),
+                            )
+                          : SvgPicture.asset(
+                              key: const ValueKey(false),
+                              AssetsManager.playIcon,
+                              width: AppSize.s24,
+                              height: AppSize.s24,
                             ),
-                          )
-                        : SvgPicture.asset(
-                            AssetsManager.playIcon,
-                            width: AppSize.s24,
-                            height: AppSize.s24,
-                          ),
+                    ),
                   ),
                   AppGap.w8,
                   _MiniPlayerButton(
@@ -111,10 +123,13 @@ class _MiniPlayerButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: child,
+    return Pressable(
+      scale: 0.85,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: child,
+      ),
     );
   }
 }

@@ -112,6 +112,8 @@ void main() {
       findsOneWidget,
     );
 
+    // * The mini player slides up from the bottom edge
+    await tester.pump(const Duration(seconds: 1));
     await tester.tap(find.byType(MiniPlayer));
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));

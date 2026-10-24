@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../constants/colors_manager.dart';
 import '../../../constants/values_manager.dart';
 import '../../../data/models/song_model.dart';
+import '../../motion.dart';
 import '../common/artwork/artwork_image.dart';
 import 'mini_player_controls.dart';
 
@@ -31,34 +32,50 @@ class MiniPlayer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const borderRadius = BorderRadius.all(AppRadius.rad12);
-    return CustomPaint(
-      painter: const _OuterShadowPainter(borderRadius: borderRadius),
-      child: GestureDetector(
-        onTap: onTap,
-        child: ClipRRect(
-          borderRadius: borderRadius,
-          child: BackdropFilter(
-            filter: ImageFilter.blur(
-              sigmaX: AppBlur.sigma20,
-              sigmaY: AppBlur.sigma20,
-            ),
-            child: Container(
-              color: ColorManager.miniPlayerBackground,
-              padding: const EdgeInsets.all(AppPadding.p8),
-              child: Row(
-                children: [
-                  ArtworkImage(song: song, size: AppSize.s84),
-                  AppGap.w8,
-                  Expanded(
-                    child: MiniPlayerControls(
-                      song: song,
-                      progress: progress,
-                      isPlaying: isPlaying,
-                      onPlayPause: onPlayPause,
-                      onSkipNext: onSkipNext,
+    return Pressable(
+      scale: 0.98,
+      child: CustomPaint(
+        painter: const _OuterShadowPainter(borderRadius: borderRadius),
+        child: GestureDetector(
+          onTap: onTap,
+          child: ClipRRect(
+            borderRadius: borderRadius,
+            child: BackdropFilter(
+              filter: ImageFilter.blur(
+                sigmaX: AppBlur.sigma20,
+                sigmaY: AppBlur.sigma20,
+              ),
+              child: Container(
+                color: ColorManager.miniPlayerBackground,
+                padding: const EdgeInsets.all(AppPadding.p8),
+                child: Row(
+                  children: [
+                    Hero(
+                      tag: Motion.coverHeroTag,
+                      child: SizedBox.square(
+                        dimension: AppSize.s84,
+                        child: MotionSwitcher(
+                          rise: 0,
+                          child: ArtworkImage(
+                            key: ValueKey(song.id),
+                            song: song,
+                            size: AppSize.s84,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                    AppGap.w8,
+                    Expanded(
+                      child: MiniPlayerControls(
+                        song: song,
+                        progress: progress,
+                        isPlaying: isPlaying,
+                        onPlayPause: onPlayPause,
+                        onSkipNext: onSkipNext,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

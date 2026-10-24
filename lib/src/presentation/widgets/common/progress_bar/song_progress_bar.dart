@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../../../constants/colors_manager.dart';
 import '../../../../constants/values_manager.dart';
+import '../../../motion.dart';
 
-class SongProgressBar extends StatelessWidget {
+class SongProgressBar extends StatefulWidget {
   /// Played fraction of the song, between 0 and 1.
   final double progress;
 
@@ -17,7 +18,21 @@ class SongProgressBar extends StatelessWidget {
   });
 
   @override
+  State<SongProgressBar> createState() => _SongProgressBarState();
+}
+
+class _SongProgressBarState extends State<SongProgressBar> {
+  /// A finger is on the bar: it thickens, so the seek is felt.
+  bool _held = false;
+
+  void _hold(bool held) {
+    if (held != _held) setState(() => _held = held);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final onSeek = widget.onSeek;
+    final progress = widget.progress;
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
@@ -26,22 +41,44 @@ class SongProgressBar extends StatelessWidget {
 
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTapDown: onSeek == null ? null : (d) => seek(d.localPosition),
+          onTapDown: onSeek == null
+              ? null
+              : (d) {
+                  _hold(true);
+                  seek(d.localPosition);
+                },
+          onTapUp: onSeek == null ? null : (_) => _hold(false),
+          onTapCancel: onSeek == null ? null : () => _hold(false),
+          onHorizontalDragStart: onSeek == null ? null : (_) => _hold(true),
           onHorizontalDragUpdate:
               onSeek == null ? null : (d) => seek(d.localPosition),
-          child: Container(
-            height: AppSize.s8,
-            width: width,
-            alignment: Alignment.centerLeft,
-            decoration: const BoxDecoration(
-              color: ColorManager.progressTrack,
-              borderRadius: BorderRadius.all(AppRadius.rad999),
+          onHorizontalDragEnd: onSeek == null ? null : (_) => _hold(false),
+          onHorizontalDragCancel: onSeek == null ? null : () => _hold(false),
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(
+              end: _held && !Motion.reduced(context) ? 1.6 : 1,
+            ),
+            duration: _held ? Motion.press : Motion.ui,
+            curve: Motion.easeOut,
+            builder: (context, thickness, child) => Transform(
+              alignment: Alignment.center,
+              transform: Matrix4.diagonal3Values(1, thickness, 1),
+              child: child,
             ),
             child: Container(
-              width: width * progress.clamp(0.0, 1.0),
+              height: AppSize.s8,
+              width: width,
+              alignment: Alignment.centerLeft,
               decoration: const BoxDecoration(
-                color: ColorManager.progressFill,
+                color: ColorManager.progressTrack,
                 borderRadius: BorderRadius.all(AppRadius.rad999),
+              ),
+              child: Container(
+                width: width * progress.clamp(0.0, 1.0),
+                decoration: const BoxDecoration(
+                  color: ColorManager.progressFill,
+                  borderRadius: BorderRadius.all(AppRadius.rad999),
+                ),
               ),
             ),
           ),

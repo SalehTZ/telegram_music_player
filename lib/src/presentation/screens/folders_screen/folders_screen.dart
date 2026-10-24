@@ -8,6 +8,7 @@ import '../../../constants/styles_manager.dart';
 import '../../../constants/values_manager.dart';
 import '../../../data/models/song_model.dart';
 import '../../../utils/song_text.dart';
+import '../../motion.dart';
 import '../../navigation.dart';
 import '../../widgets/common/artwork/artwork_image.dart';
 import '../../widgets/music_folders/music_folders.dart';
@@ -20,59 +21,67 @@ class FoldersScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<LibraryCubit, LibraryState>(
-      builder: (context, state) {
-        final folders = state.folders;
-        final picksFolders = context.read<LibraryCubit>().pickedFolders != null;
-        return ListView.separated(
-          padding: EdgeInsets.fromLTRB(
-              AppPadding.p20, AppPadding.p20, AppPadding.p20, bottomPadding),
-          itemCount: folders.length + 1,
-          separatorBuilder: (_, __) => AppGap.h8,
-          itemBuilder: (context, index) {
-            if (index == 0) {
-              final count = Text(
-                folders.length == 1 ? '1 folder' : '${folders.length} folders',
-                style: TextStyles.getSemiBoldStyle(fontSize: FontSize.s20),
-              );
-              return Padding(
-                padding: const EdgeInsets.only(bottom: AppPadding.p12),
-                child: picksFolders
-                    ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const MusicFolders(),
-                          AppGap.h40,
-                          count,
-                        ],
-                      )
-                    : count,
-              );
-            }
-            final folder = folders[index - 1];
-            final name = Song.folderName(folder.name);
-            return CollectionRow(
-              cover: folder.songs.first,
-              title: name,
-              detail: displayPath(folder.name),
-              count: folder.songs.length,
-              // * Only when the name doesn't already say so
-              tag: folder.songs.first.fromTelegram &&
-                      !name.toLowerCase().contains('telegram')
-                  ? 'Telegram'
-                  : null,
-              onTap: () => openSongList(
-                context,
-                title: name,
-                select: (s) => [
-                  for (final f in s.folders)
-                    if (f.name == folder.name) ...f.songs,
-                ],
-              ),
-            );
-          },
-        );
-      },
+    return ArrivalScope(
+      child: BlocBuilder<LibraryCubit, LibraryState>(
+        builder: (context, state) {
+          final folders = state.folders;
+          final picksFolders =
+              context.read<LibraryCubit>().pickedFolders != null;
+          return ListView.separated(
+            padding: EdgeInsets.fromLTRB(
+                AppPadding.p20, AppPadding.p20, AppPadding.p20, bottomPadding),
+            itemCount: folders.length + 1,
+            separatorBuilder: (_, __) => AppGap.h8,
+            itemBuilder: (context, index) => Arrive(
+              index: index,
+              child: Builder(builder: (context) {
+                if (index == 0) {
+                  final count = Text(
+                    folders.length == 1
+                        ? '1 folder'
+                        : '${folders.length} folders',
+                    style: TextStyles.getSemiBoldStyle(fontSize: FontSize.s20),
+                  );
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: AppPadding.p12),
+                    child: picksFolders
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const MusicFolders(),
+                              AppGap.h40,
+                              count,
+                            ],
+                          )
+                        : count,
+                  );
+                }
+                final folder = folders[index - 1];
+                final name = Song.folderName(folder.name);
+                return CollectionRow(
+                  cover: folder.songs.first,
+                  title: name,
+                  detail: displayPath(folder.name),
+                  count: folder.songs.length,
+                  // * Only when the name doesn't already say so
+                  tag: folder.songs.first.fromTelegram &&
+                          !name.toLowerCase().contains('telegram')
+                      ? 'Telegram'
+                      : null,
+                  onTap: () => openSongList(
+                    context,
+                    title: name,
+                    select: (s) => [
+                      for (final f in s.folders)
+                        if (f.name == folder.name) ...f.songs,
+                    ],
+                  ),
+                );
+              }),
+            ),
+          );
+        },
+      ),
     );
   }
 }

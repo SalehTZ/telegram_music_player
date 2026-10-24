@@ -8,6 +8,7 @@ import '../../../../constants/colors_manager.dart';
 import '../../../../constants/values_manager.dart';
 import '../../../../data/library/artwork_cache.dart';
 import '../../../../data/models/song_model.dart';
+import '../../../motion.dart';
 
 /// A song's embedded cover, or a dark tile with a note when it has none.
 class ArtworkImage extends StatelessWidget {
@@ -40,14 +41,27 @@ class ArtworkImage extends StatelessWidget {
             : FutureBuilder<Uint8List?>(
                 future: cache.get(song, quality),
                 initialData: cache.peek(song, quality),
+                // * A cover that has to be read fades in over the tile;
+                // * one already in memory is there at once
                 builder: (context, snapshot) {
                   final cover = snapshot.data;
-                  if (cover == null) return const ArtworkPlaceholder();
-                  return Image.memory(
-                    cover,
-                    fit: BoxFit.cover,
-                    gaplessPlayback: true,
-                    errorBuilder: (_, __, ___) => const ArtworkPlaceholder(),
+                  return AnimatedSwitcher(
+                    duration: Motion.ui,
+                    switchInCurve: Motion.easeOut,
+                    layoutBuilder: (current, previous) => Stack(
+                      fit: StackFit.passthrough,
+                      children: [...previous, if (current != null) current],
+                    ),
+                    child: cover == null
+                        ? const ArtworkPlaceholder()
+                        : Image.memory(
+                            key: const ValueKey(true),
+                            cover,
+                            fit: BoxFit.cover,
+                            gaplessPlayback: true,
+                            errorBuilder: (_, __, ___) =>
+                                const ArtworkPlaceholder(),
+                          ),
                   );
                 },
               ),
