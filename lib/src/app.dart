@@ -19,6 +19,7 @@ class MusicPlayerApp extends StatelessWidget {
         systemNavigationBarColor: ColorManager.backgroundColor,
       ),
       child: MaterialApp(
+        title: "Stash",
         debugShowCheckedModeBanner: false,
         navigatorKey: GlobalKey<NavigatorState>(),
         theme: ThemesManager.nightTheme,

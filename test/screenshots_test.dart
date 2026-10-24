@@ -9,9 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:telegram_music_player/src/app.dart';
-import 'package:telegram_music_player/src/presentation/widgets/audio_player/mini_music_player.dart';
-import 'package:telegram_music_player/src/presentation/widgets/common/round_button/round_button_widget.dart';
+import 'package:stash/src/app.dart';
+import 'package:stash/src/presentation/widgets/audio_player/mini_music_player.dart';
+import 'package:stash/src/presentation/widgets/common/round_button/round_button_widget.dart';
 
 const screenshotDir = String.fromEnvironment('SCREENSHOT_DIR');
 const _rootKey = ValueKey('screenshot-root');

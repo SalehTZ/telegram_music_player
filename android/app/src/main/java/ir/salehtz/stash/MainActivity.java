@@ -1,4 +1,4 @@
-package com.example.telegram_music_player;
+package ir.salehtz.stash;
 
 import io.flutter.embedding.android.FlutterActivity;
 

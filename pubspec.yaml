@@ -1,4 +1,4 @@
-name: telegram_music_player
+name: stash
 description: "A music player for the songs you collect on Telegram."
 publish_to: "none"
 version: 0.1.0

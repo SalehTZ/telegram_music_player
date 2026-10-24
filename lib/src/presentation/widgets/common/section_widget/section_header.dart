@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:telegram_music_player/src/constants/values_manager.dart';
+import 'package:stash/src/constants/values_manager.dart';
 
 class SectionHeader extends StatelessWidget {
   final Widget child;

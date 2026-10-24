@@ -1,4 +1,8 @@
-<h1 align="center">Telegram Music Player</h1>
+<p align="center">
+  <img src="docs/icon.png" width="120" alt="Stash icon">
+</p>
+
+<h1 align="center">Stash</h1>
 
 <p align="center">
   <b>All the music you saved on Telegram, in one player.</b><br>
@@ -8,7 +12,7 @@
 
 <p align="center">
   <a href="https://github.com/SalehTZ/telegram_music_player/releases"><img alt="Download" src="https://img.shields.io/github/v/release/SalehTZ/telegram_music_player?label=download&style=for-the-badge&color=5947B2"></a>
-  <a href="#support-telegram-music-player"><img alt="Donate" src="https://img.shields.io/badge/donate-%E2%99%A5-ff5c8a?style=for-the-badge"></a>
+  <a href="#support-stash"><img alt="Donate" src="https://img.shields.io/badge/donate-%E2%99%A5-ff5c8a?style=for-the-badge"></a>
 </p>
 
 <p align="center">
@@ -29,11 +33,11 @@
 
 ---
 
-## Why Telegram Music Player?
+## Why Stash?
 
 Telegram is where a lot of us find music: channels, groups, friends sending
 songs. But those files end up scattered, with titles like `@SomeChannel - track 03`
-and no cover art. This app gathers them in one place and cleans them up.
+and no cover art. Stash gathers them in one place and cleans them up.
 
 Done:
 
@@ -55,10 +59,10 @@ Grab the latest build from **[Releases](https://github.com/SalehTZ/telegram_musi
 
 | Platform | File |
 |---|---|
-| Android | `telegram-music-player-android-arm64-v8a.apk` (most phones), `armeabi-v7a` for older ones, `x86_64` for emulators and Chromebooks |
+| Android | `stash-android-arm64-v8a.apk` (most phones), `armeabi-v7a` for older ones, `x86_64` for emulators and Chromebooks |
 
-If you installed **v0.1.0**, uninstall it before installing a newer version. It
-was a preview signed with a temporary key, so Android won't update it.
+If you installed **v0.1.0**, uninstall it. That preview was still called Telegram
+Music Player and Android sees it as a different app, so Stash won't replace it.
 
 <details>
 <summary>Verify that an APK is really from us</summary>
@@ -68,7 +72,7 @@ Every official Android release is signed with the same key as
 Android SDK build-tools):
 
 ```bash
-apksigner verify --print-certs telegram-music-player-android-*.apk
+apksigner verify --print-certs stash-android-*.apk
 ```
 
 The `SHA-256` digest must be:
@@ -82,9 +86,9 @@ can't update an existing install. Each release also lists the files' checksums
 in `SHA256SUMS.txt`.
 </details>
 
-## Support Telegram Music Player
+## Support Stash
 
-Telegram Music Player is free and always will be: no ads, no paywalls, no "pro"
+Stash is free and always will be: no ads, no paywalls, no "pro"
 version. If you like it, please consider chipping in. Donations pay for the
 hours that go into building it and keep it free for everyone.
 
