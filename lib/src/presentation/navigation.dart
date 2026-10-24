@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../blocs/library/library_cubit.dart';
 import '../data/lyrics/lyrics.dart';
 import '../data/models/song_model.dart';
+import 'screens/duplicates_screen/duplicates_screen.dart';
 import 'screens/edit_tags_screen/edit_tags_screen.dart';
 import 'screens/lyrics_screen/lyrics_screen.dart';
 import 'screens/player_screen/player_screen.dart';
@@ -15,6 +16,9 @@ Future<T?> _push<T>(BuildContext context, Widget page) =>
 void openPlayer(BuildContext context) => _push(context, const PlayerScreen());
 
 void openTidy(BuildContext context) => _push(context, const TidyScreen());
+
+void openDuplicates(BuildContext context) =>
+    _push(context, const DuplicatesScreen());
 
 void openEditTags(BuildContext context, Song song) =>
     _push(context, EditTagsScreen(song: song));

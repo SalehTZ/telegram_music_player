@@ -31,6 +31,10 @@ abstract class MusicLibrary {
   /// for files other apps saved, like the ones from Telegram.
   Future<bool> requestWriteAccess(List<Song> songs);
 
+  /// Deletes the files of [songs] after one OK from the user, which Android
+  /// 11 and later ask for in a system dialog. False when the user said no.
+  Future<bool> delete(List<Song> songs);
+
   /// Writes [edit] into the song's file and waits until the library knows.
   Future<void> writeTag(Song song, TagEdit edit);
 

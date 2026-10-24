@@ -17,6 +17,7 @@ import '../../widgets/song_list_item/song_list_item_widget.dart';
 import '../../widgets/song_options/song_options_sheet.dart';
 import '../../widgets/song_thumbnail/song_thumbnail_widget.dart';
 import '../main_screen/library_gate.dart';
+import 'duplicates_card.dart';
 import 'tidy_card.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -57,6 +58,10 @@ class _HomeScreenState extends State<HomeScreen> {
               if (state.fixes.isNotEmpty) ...[
                 AppGap.h28,
                 TidyCard(state: state),
+              ],
+              if (state.duplicates.isNotEmpty) ...[
+                AppGap.h28,
+                DuplicatesCard(state: state),
               ],
               if (state.recentlyPlayed.isNotEmpty) ...[
                 AppGap.h28,

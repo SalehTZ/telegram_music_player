@@ -11,9 +11,9 @@ const _downloads = '/storage/emulated/0/Download/Telegram';
 const _music = '/storage/emulated/0/Music';
 
 /// A small library the way Telegram leaves it: channel names stamped into
-/// the tags, a file named "Artist - Title" with no tags at all, and a WMA
-/// Stash can't change. MP3s carry real ID3 tags, so edits run the real
-/// writer.
+/// the tags, a file named "Artist - Title" with no tags at all, a WMA Stash
+/// can't change and a song saved twice. MP3s carry real ID3 tags, so edits
+/// run the real writer.
 class DemoMusicLibrary implements MusicLibrary {
   bool granted;
   Access answer;
@@ -21,6 +21,7 @@ class DemoMusicLibrary implements MusicLibrary {
   final Map<int, Uint8List> covers;
 
   int writeRequests = 0;
+  int deleteRequests = 0;
   int settingsOpened = 0;
   final _imports = StreamController<({List<String> saved, int failed})>();
   final _files = <int, Uint8List>{};
@@ -43,6 +44,7 @@ class DemoMusicLibrary implements MusicLibrary {
       String album,
       int seconds, {
       String? lyrics,
+      int kbps = 128,
     }) {
       id++;
       final path = '$folder/$file';
@@ -61,6 +63,7 @@ class DemoMusicLibrary implements MusicLibrary {
         uri: 'content://media/external/audio/media/$id',
         duration: Duration(seconds: seconds),
         added: added.subtract(Duration(hours: id * 5)),
+        size: seconds * kbps * 125,
       );
     }
 
@@ -95,6 +98,10 @@ class DemoMusicLibrary implements MusicLibrary {
           230),
       song(_music, 'Midnight City.mp3', 'Midnight City', 'M83',
           "Hurry Up, We're Dreaming", 243),
+      // * A better copy of a song that's already here
+      song(_downloads, 'The Weeknd - Blinding Lights.mp3', 'Blinding Lights',
+          'The Weeknd', 'After Hours', 201,
+          kbps: 320),
     ];
   }
 
@@ -139,6 +146,14 @@ class DemoMusicLibrary implements MusicLibrary {
   }
 
   @override
+  Future<bool> delete(List<Song> songs) async {
+    deleteRequests++;
+    if (!allowWrites) return false;
+    _songs.removeWhere(songs.contains);
+    return true;
+  }
+
+  @override
   Future<void> writeTag(Song song, TagEdit edit) async {
     final file = _files[song.id];
     if (file == null) throw const TagException('Not an MP3');
@@ -155,6 +170,7 @@ class DemoMusicLibrary implements MusicLibrary {
       uri: song.uri,
       duration: song.duration,
       added: song.added,
+      size: song.size,
     );
     if (edit.cover != null) covers[song.id] = edit.cover!;
   }

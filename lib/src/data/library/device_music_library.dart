@@ -111,6 +111,17 @@ class DeviceMusicLibrary implements MusicLibrary {
       false;
 
   @override
+  Future<bool> delete(List<Song> songs) async =>
+      await _channel.invokeMethod<bool>(
+        'delete',
+        {
+          'uris': [for (final song in songs) song.uri],
+          'paths': [for (final song in songs) song.path],
+        },
+      ) ??
+      false;
+
+  @override
   Future<void> writeTag(Song song, TagEdit edit) async {
     if (!song.canEditTags) {
       throw TagException("Stash can't change ${song.format} files");

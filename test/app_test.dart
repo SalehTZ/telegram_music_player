@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:stash/src/blocs/library/library_cubit.dart';
 import 'package:stash/src/data/library/music_library.dart';
 import 'package:stash/src/presentation/screens/home_screen/tidy_card.dart';
 import 'package:stash/src/presentation/screens/player_screen/player_screen.dart';
@@ -179,8 +181,40 @@ void main() {
     await pumpApp(tester);
     await tester.enterText(find.byType(TextFormField), 'weeknd');
     await tester.pumpAndSettle();
-    expect(find.text('3 songs'), findsOneWidget);
-    expect(find.byType(SongListItemWidget), findsNWidgets(3));
+    expect(find.text('4 songs'), findsOneWidget);
+    expect(find.byType(SongListItemWidget), findsNWidgets(4));
+  });
+
+  testWidgets('duplicates keep the best copy and its favorite', (tester) async {
+    final library = await pumpApp(tester);
+    final worse = library.byTitle('Blinding Lights');
+    expect(worse.bitrate, 128);
+    final cubit = tester
+        .element(find.byType(Scaffold).first)
+        .read<LibraryCubit>()
+      ..toggleFavorite(worse);
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.text('See duplicates'),
+      200,
+      scrollable: find
+          .ancestor(
+              of: find.byType(TidyCard), matching: find.byType(Scrollable))
+          .first,
+    );
+    await tester.tap(find.text('See duplicates'));
+    await tester.pumpAndSettle();
+    expect(find.text('Keep'), findsOneWidget);
+    await tester.tap(find.text('Delete 1 copy'));
+    await tester.pumpAndSettle();
+
+    expect(library.deleteRequests, 1);
+    expect(find.text('Deleted 1 copy.'), findsOneWidget);
+    final kept = cubit.state.songs.where((s) => s.title == 'Blinding Lights');
+    expect(kept.single.bitrate, 320);
+    expect(cubit.state.isFavorite(kept.single), isTrue);
+    expect(cubit.state.duplicates, isEmpty);
   });
 
   testWidgets('a song shared to Stash is announced', (tester) async {

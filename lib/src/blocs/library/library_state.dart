@@ -127,6 +127,68 @@ class LibraryState {
     ]..sort((a, b) => b.songs.length.compareTo(a.songs.length));
   }();
 
+  /// Copies of the same song: the same title and artist once cleaned, and
+  /// within a few seconds of each other. The best copy comes first in each.
+  late final List<List<Song>> duplicates = () {
+    final byName = <String, List<Song>>{};
+    for (final s in songs) {
+      final key = _sameSongKey(s);
+      if (key != null) byName.putIfAbsent(key, () => []).add(s);
+    }
+    final groups = <List<Song>>[];
+    for (final named in byName.values.where((g) => g.length > 1)) {
+      named.sort((a, b) => a.duration.compareTo(b.duration));
+      var group = [named.first];
+      for (final s in named.skip(1)) {
+        if (s.duration - group.last.duration > const Duration(seconds: 3)) {
+          if (group.length > 1) groups.add(group);
+          group = [s];
+        } else {
+          group.add(s);
+        }
+      }
+      if (group.length > 1) groups.add(group);
+    }
+    for (final group in groups) {
+      group.sort(_betterCopy);
+    }
+    return groups;
+  }();
+
+  /// Title and artist with stamps, case and punctuation taken out, or null
+  /// when the song has no title to go by.
+  String? _sameSongKey(Song s) {
+    final fix = fixes[s.id];
+    final title = _plain(fix?.title ?? s.title);
+    final artist = _plain(fix?.artist ?? s.artist);
+    return title.isEmpty ? null : '$artist\u0000$title';
+  }
+
+  static String _plain(String value) => value
+      .toLowerCase()
+      .replaceAll('ي', 'ی')
+      .replaceAll('ك', 'ک')
+      .replaceAll(RegExp(r'[^\p{L}\p{N}]+', unicode: true), ' ')
+      .trim();
+
+  /// Lossless first, then the higher bitrate, the cleaner tags and the
+  /// newer file.
+  int _betterCopy(Song a, Song b) {
+    int lossless(Song s) => s.format == 'FLAC' ? 1 : 0;
+    int clean(Song s) => fixes.containsKey(s.id) ? 0 : 1;
+    return switch (lossless(b) - lossless(a)) {
+      0 => switch ((b.bitrate - a.bitrate) ~/ 16) {
+          // * Bitrates within 16 kbps are the same quality
+          0 => switch (clean(b) - clean(a)) {
+              0 => b.added.compareTo(a.added),
+              final c => c,
+            },
+          final c => c,
+        },
+      final c => c,
+    };
+  }
+
   Map<String, Object?> toJson() => {
         'favorites': favorites,
         'history': history,

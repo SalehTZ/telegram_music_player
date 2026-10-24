@@ -210,6 +210,34 @@ class LibraryCubit extends Cubit<LibraryState> {
     return failed;
   }
 
+  /// Deletes the copies in [keeping], each a duplicate of the song it maps
+  /// to. Favorites, history and playlists move over to the kept song.
+  /// Returns why nothing was deleted, or null.
+  Future<String?> deleteCopies(Map<Song, Song> keeping) async {
+    try {
+      if (!await library.delete([...keeping.keys])) {
+        return 'Nothing deleted: Stash needs your OK to delete these files.';
+      }
+    } on PlatformException catch (e) {
+      return e.message ?? "Couldn't delete the files.";
+    }
+    final moved = {
+      for (final MapEntry(key: copy, value: kept) in keeping.entries)
+        copy.key: kept.key,
+    };
+    List<String> move(List<String> keys) =>
+        [...keys.map((k) => moved[k] ?? k).toSet()];
+    _change(state.copyWith(
+      favorites: move(state.favorites),
+      history: move(state.history),
+      playlists: [
+        for (final p in state.playlists) Playlist(p.name, move(p.songKeys)),
+      ],
+    ));
+    await refresh();
+    return null;
+  }
+
   void _onImported(({List<String> saved, int failed}) result) {
     refresh();
     final saved = result.saved;
