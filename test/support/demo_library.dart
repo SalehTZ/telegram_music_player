@@ -116,6 +116,9 @@ class DemoMusicLibrary implements MusicLibrary {
   Stream<({List<String> saved, int failed})> get imports => _imports.stream;
 
   @override
+  Stream<void> get changes => const Stream.empty();
+
+  @override
   Future<bool> hasPermission() async => granted;
 
   @override

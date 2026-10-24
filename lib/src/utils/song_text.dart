@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import '../data/models/song_model.dart';
 
 /// "24 songs · 1 h 32 min"
@@ -11,6 +13,16 @@ String describeSongs(List<Song> songs) {
   return '$count · $length';
 }
 
-/// "Music/Telegram" instead of "/storage/emulated/0/Music/Telegram".
-String displayPath(String path) =>
-    path.replaceFirst(RegExp(r'^/storage/emulated/\d+/'), '');
+/// "Music/Telegram" instead of "/storage/emulated/0/Music/Telegram", and
+/// "~/Music" instead of "/home/you/Music".
+String displayPath(String path) {
+  final home =
+      Platform.environment[Platform.isWindows ? 'USERPROFILE' : 'HOME'];
+  if (!Platform.isAndroid && home != null && home.length > 1) {
+    if (path == home) return '~';
+    if (path.startsWith('$home${Platform.pathSeparator}')) {
+      return '~${path.substring(home.length)}';
+    }
+  }
+  return path.replaceFirst(RegExp(r'^/storage/emulated/\d+/'), '');
+}

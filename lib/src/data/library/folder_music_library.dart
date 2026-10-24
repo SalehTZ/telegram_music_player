@@ -12,17 +12,28 @@ import 'music_library.dart';
 /// The songs in folders on a computer, for platforms without a media
 /// library like Android's: Linux, Windows and macOS. Stash reads the tags
 /// itself and keeps what it read in [cache], so a rescan only opens files
-/// that changed.
-class FolderMusicLibrary implements MusicLibrary {
-  final List<Directory> folders;
+/// that changed. The folders are watched, so new songs show up by
+/// themselves.
+class FolderMusicLibrary implements MusicLibrary, PickedFolders {
+  /// The folders to look in until the user picks their own.
+  final List<Directory> defaults;
   final File? cache;
+
+  /// Where the folders the user picked are kept.
+  final File? settings;
 
   /// Ids stay the same for a path as long as Stash runs, so the player and
   /// the covers keep up with rescans.
   final _ids = <String, int>{};
   Map<String, Map<String, Object?>>? _scanned;
+  List<String>? _folders;
+  final _imports =
+      StreamController<({List<String> saved, int failed})>.broadcast();
+  final _changes = StreamController<void>.broadcast();
+  final _watches = <String, StreamSubscription<FileSystemEvent>>{};
+  Timer? _settle;
 
-  FolderMusicLibrary(this.folders, {this.cache});
+  FolderMusicLibrary(this.defaults, {this.cache, this.settings});
 
   /// The user's music folder and Telegram Desktop's downloads.
   static List<Directory> defaultFolders() {
@@ -66,8 +77,118 @@ class FolderMusicLibrary implements MusicLibrary {
   };
 
   @override
-  Stream<({List<String> saved, int failed})> get imports =>
-      const Stream.empty();
+  Stream<({List<String> saved, int failed})> get imports => _imports.stream;
+
+  @override
+  Stream<void> get changes => _changes.stream;
+
+  @override
+  List<String> get folders =>
+      _folders ?? [for (final folder in defaults) folder.path];
+
+  Future<List<String>> _current() async {
+    if (_folders case final folders?) return folders;
+    final file = settings;
+    if (file != null && await file.exists()) {
+      try {
+        final saved = jsonDecode(await file.readAsString()) as Map;
+        return _folders = (saved['folders'] as List).cast<String>();
+      } on FormatException {
+        // * Damaged: start over from the defaults
+      }
+    }
+    return _folders = folders;
+  }
+
+  Future<void> _saveFolders(List<String> folders) async {
+    _folders = folders;
+    final file = settings;
+    if (file == null) return;
+    final temp = File('${file.path}.tmp');
+    await temp.writeAsString(jsonEncode({'folders': folders}), flush: true);
+    await temp.rename(file.path);
+  }
+
+  static String _clean(String path) {
+    final sep = Platform.pathSeparator;
+    final absolute = Directory(path).absolute.path;
+    return absolute.length > 1 && absolute.endsWith(sep)
+        ? absolute.substring(0, absolute.length - 1)
+        : absolute;
+  }
+
+  /// Whether [path] is [folder] or somewhere inside it.
+  static bool _inside(String path, String folder) =>
+      path == folder || path.startsWith('$folder${Platform.pathSeparator}');
+
+  @override
+  Future<bool> addFolder(String path) async {
+    final folder = _clean(path);
+    final current = await _current();
+    if (current.any((f) => _inside(folder, f))) return false;
+    // * A folder around ones already listed takes their place
+    await _saveFolders([...current.where((f) => !_inside(f, folder)), folder]);
+    return true;
+  }
+
+  @override
+  Future<void> removeFolder(String path) async {
+    final current = await _current();
+    await _saveFolders([...current.where((f) => f != path)]);
+  }
+
+  @override
+  Future<int> importPaths(List<String> paths) async {
+    final saved = <String>[];
+    var failed = 0;
+    var added = 0;
+    for (final path in paths) {
+      try {
+        if (await FileSystemEntity.isDirectory(path)) {
+          if (await addFolder(path)) added++;
+          continue;
+        }
+        if (!_audio.contains(_format(path))) {
+          failed++;
+          continue;
+        }
+        final current = await _current();
+        // * Already in the library
+        if (current.any((f) => _inside(_clean(path), f))) continue;
+        if (current.isEmpty) {
+          if (defaults.isEmpty) throw const FileSystemException('No folder');
+          await addFolder(defaults.first.path);
+        }
+        final sep = Platform.pathSeparator;
+        final target = await Directory('${(await _current()).first}${sep}Stash')
+            .create(recursive: true);
+        final name =
+            _freeName(target, path.substring(path.lastIndexOf(sep) + 1));
+        await File(path).copy('${target.path}$sep$name');
+        saved.add(name);
+      } on FileSystemException {
+        failed++;
+      }
+    }
+    if (saved.isNotEmpty || failed > 0) {
+      _imports.add((saved: saved, failed: failed));
+    }
+    return added;
+  }
+
+  /// [name], or "name (2).mp3" and so on when [folder] already has it.
+  static String _freeName(Directory folder, String name) {
+    final dot = name.lastIndexOf('.');
+    final base = dot > 0 ? name.substring(0, dot) : name;
+    final ext = dot > 0 ? name.substring(dot) : '';
+    var free = name;
+    for (var n = 2;
+        File('${folder.path}${Platform.pathSeparator}$free').existsSync();
+        n++) {
+      free = '$base ($n)$ext';
+    }
+    return free;
+  }
 
   @override
   Future<bool> hasPermission() async => true;
@@ -82,10 +203,15 @@ class FolderMusicLibrary implements MusicLibrary {
   Future<List<Song>> songs() async {
     final scanned = _scanned ??= await _loadCache();
     final found = <String, Map<String, Object?>>{};
-    for (final folder in folders) {
+    final roots = await _current();
+    final dirs = <String>[];
+    for (final root in roots) {
+      final folder = Directory(root);
       if (!await folder.exists()) continue;
+      dirs.add(folder.path);
       await for (final entry
           in folder.list(recursive: true, followLinks: false)) {
+        if (entry is Directory) dirs.add(entry.path);
         if (entry is! File) continue;
         final path = entry.path;
         final format = _format(path);
@@ -105,6 +231,7 @@ class FolderMusicLibrary implements MusicLibrary {
     }
     _scanned = found;
     await _saveCache(found);
+    _watch(dirs);
     final songs = [
       for (final MapEntry(key: path, value: row) in found.entries)
         Song(
@@ -120,6 +247,47 @@ class FolderMusicLibrary implements MusicLibrary {
         ),
     ];
     return songs..sort((a, b) => b.added.compareTo(a.added));
+  }
+
+  /// Watches [dirs] for songs coming and going. Linux watches one folder at
+  /// a time, so it gets every folder; the others watch the top folders with
+  /// everything inside.
+  void _watch(List<String> dirs) {
+    if (!FileSystemEntity.isWatchSupported) return;
+    final roots = {
+      for (final d in dirs)
+        if (_folders!.contains(d)) d
+    };
+    final wanted = Platform.isLinux ? dirs.toSet() : roots;
+    for (final gone in _watches.keys.toSet().difference(wanted)) {
+      _watches.remove(gone)?.cancel();
+    }
+    for (final dir in wanted.difference(_watches.keys.toSet())) {
+      try {
+        _watches[dir] = Directory(dir)
+            .watch(recursive: !Platform.isLinux)
+            .listen(_onEvent, onError: (_) => _watches.remove(dir));
+      } on FileSystemException {
+        // * Out of watches: the folder is still read on each refresh
+      }
+    }
+  }
+
+  void _onEvent(FileSystemEvent event) {
+    // * Folders matter too: a new one may hold songs
+    if (!event.isDirectory && !_audio.contains(_format(event.path))) return;
+    // * Copying a song in sends many events: wait until they stop
+    _settle?.cancel();
+    _settle = Timer(const Duration(seconds: 1), () => _changes.add(null));
+  }
+
+  /// Stops watching the folders.
+  void dispose() {
+    _settle?.cancel();
+    for (final watch in _watches.values) {
+      watch.cancel();
+    }
+    _watches.clear();
   }
 
   static String _format(String path) {

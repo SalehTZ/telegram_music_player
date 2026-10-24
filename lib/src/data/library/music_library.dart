@@ -41,4 +41,25 @@ abstract class MusicLibrary {
   /// Songs shared to Stash from other apps, after they were saved to
   /// Music/Stash: the saved file names and how many could not be saved.
   Stream<({List<String> saved, int failed})> get imports;
+
+  /// Fires when songs were added, changed or removed by something other
+  /// than Stash, so the library is worth loading again.
+  Stream<void> get changes;
+}
+
+/// A library of folders the user picks, as on a computer.
+abstract interface class PickedFolders {
+  /// The folders Stash looks in, with everything inside them.
+  List<String> get folders;
+
+  /// Adds [path], unless a folder already listed holds it. False when it
+  /// was already there.
+  Future<bool> addFolder(String path);
+
+  Future<void> removeFolder(String path);
+
+  /// Copies the audio files among [paths] into the first folder's "Stash"
+  /// folder, and adds the folders among them. The result arrives on
+  /// [MusicLibrary.imports]. Returns how many folders were added.
+  Future<int> importPaths(List<String> paths);
 }

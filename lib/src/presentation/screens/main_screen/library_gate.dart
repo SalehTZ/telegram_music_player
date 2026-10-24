@@ -6,6 +6,7 @@ import '../../../constants/colors_manager.dart';
 import '../../../constants/fonts_manager.dart';
 import '../../../constants/styles_manager.dart';
 import '../../../constants/values_manager.dart';
+import '../../widgets/music_folders/music_folders.dart';
 
 /// What the app shows until it can list the songs: the permission it needs,
 /// or why the library couldn't be read.
@@ -57,6 +58,18 @@ class EmptyLibrary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (context.read<LibraryCubit>().pickedFolders != null && canPickFolders) {
+      return _Message(
+        title: 'No songs yet',
+        body: 'Songs in your Music folder and in Telegram Desktop\'s '
+            'downloads show up here. Add the folder your music is in, or '
+            'drop songs on this window.',
+        action: FilledButton(
+          onPressed: () => addMusicFolder(context),
+          child: const Text('Add a folder'),
+        ),
+      );
+    }
     return _Message(
       title: 'No songs yet',
       body: 'Songs you save to Music or Download show up here.',

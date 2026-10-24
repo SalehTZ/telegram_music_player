@@ -12,6 +12,7 @@ import '../../widgets/appbar/appbar_widget.dart';
 import '../../widgets/audio_player/now_playing_bar.dart';
 import '../../widgets/audio_player/player_panel.dart';
 import '../../widgets/drawer/app_drawer.dart';
+import '../../widgets/music_folders/music_folders.dart';
 import '../folders_screen/folders_screen.dart';
 import '../home_screen/home_screen.dart';
 import '../playlists_screen/playlists_screen.dart';
@@ -95,38 +96,40 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
           setState(() => _page = DrawerPage.home);
         }
       },
-      child: Scaffold(
-        key: _scaffoldKey,
-        appBar: wide ? null : const AppBarWidget(),
-        drawer: wide ? null : AppDrawer(page: _page, onPageSelected: _select),
-        drawerScrimColor: ColorManager.transparent,
-        body: !wide
-            ? library
-            : Row(
-                children: [
-                  DecoratedBox(
-                    decoration: const BoxDecoration(
-                      border: BorderDirectional(
-                        end: BorderSide(color: ColorManager.hairline),
+      child: DropToAdd(
+        child: Scaffold(
+          key: _scaffoldKey,
+          appBar: wide ? null : const AppBarWidget(),
+          drawer: wide ? null : AppDrawer(page: _page, onPageSelected: _select),
+          drawerScrimColor: ColorManager.transparent,
+          body: !wide
+              ? library
+              : Row(
+                  children: [
+                    DecoratedBox(
+                      decoration: const BoxDecoration(
+                        border: BorderDirectional(
+                          end: BorderSide(color: ColorManager.hairline),
+                        ),
+                      ),
+                      child: NavPanel(
+                        width: AppSize.s240,
+                        page: _page,
+                        onPageSelected: _select,
                       ),
                     ),
-                    child: NavPanel(
-                      width: AppSize.s240,
-                      page: _page,
-                      onPageSelected: _select,
+                    Expanded(
+                      child: SafeArea(
+                        left: false,
+                        right: false,
+                        bottom: false,
+                        child: library,
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    child: SafeArea(
-                      left: false,
-                      right: false,
-                      bottom: false,
-                      child: library,
-                    ),
-                  ),
-                  if (panel) const PlayerPanel(),
-                ],
-              ),
+                    if (panel) const PlayerPanel(),
+                  ],
+                ),
+        ),
       ),
     );
   }

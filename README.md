@@ -96,6 +96,11 @@ in libmpv; the tarball needs it installed already. The macOS app isn't notarized
 first time with right-click > **Open**. The iOS build is unsigned and can't
 find songs yet: it's there for testing.
 
+On a computer Stash plays the songs in your Music folder and in Telegram
+Desktop's downloads. Add other folders on the Folders page, or drop songs and
+folders on the window. Media keys and the system's now-playing controls work
+on all three.
+
 On Android, **[add Stash to Obtainium](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22ir.salehtz.stash%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FSalehTZ%2FStash%22%2C%22author%22%3A%22SalehTZ%22%2C%22name%22%3A%22Stash%22%7D)** to get updates straight from these releases.
 
 If you installed **v0.1.0**, uninstall it. That preview was still called Telegram
@@ -184,6 +189,12 @@ flutter run
 
 # Release build, one APK per CPU type
 flutter build apk --release --split-per-abi
+
+# Desktop builds, each on its own system. Linux needs libgtk-3-dev and
+# libmpv-dev.
+flutter build linux --release
+flutter build windows --release
+flutter build macos --release
 ```
 
 Run the checks that CI runs:

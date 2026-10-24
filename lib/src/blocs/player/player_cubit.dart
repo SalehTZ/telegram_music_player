@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -178,8 +179,9 @@ class PlayerCubit extends Cubit<PlayerState> {
           album: song.album,
           duration: song.duration,
           // * shortcut: the notification shows the cover on Android 10 and
-          // * later only; older ones would need the album art URI.
-          artUri: Uri.parse(song.uri),
+          // * later only; older ones would need the album art URI. Computers
+          // * can't read a cover out of a song file, so they go without.
+          artUri: Platform.isAndroid ? Uri.parse(song.uri) : null,
           extras: const {'loadThumbnailUri': true},
         ),
       );
