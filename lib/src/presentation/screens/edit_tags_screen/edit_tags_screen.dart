@@ -185,7 +185,8 @@ class _EditTagsScreenState extends State<EditTagsScreen> {
                 if (song.canEditTags && hasStamps) ...[
                   AppGap.h16,
                   _Notice(
-                    text: 'These tags carry Telegram channel names.',
+                    text:
+                        'These tags carry channel or website names, or garbled text.',
                     action: TextButton(
                       onPressed: editable ? _clean : null,
                       child: const Text('Take them out'),

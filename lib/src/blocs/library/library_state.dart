@@ -73,7 +73,8 @@ class LibraryState {
         s.id: fix,
   };
 
-  /// The Telegram channels stamped into the library, the most songs first.
+  /// The Telegram channels and websites stamped into the library, the most
+  /// songs first.
   late final List<({String name, int songs})> channels = () {
     final names = <String, String>{};
     final counts = <String, int>{};
@@ -81,7 +82,8 @@ class LibraryState {
       final found = {
         for (final field in [s.title, s.artist, s.album])
           for (final name in TagCleaner.channels(field))
-            if (name.startsWith('@')) name.toLowerCase(): name,
+            if (name.startsWith('@') || name.contains('.'))
+              name.toLowerCase(): name,
       };
       for (final entry in found.entries) {
         names.putIfAbsent(entry.key, () => entry.value);

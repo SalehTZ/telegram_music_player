@@ -1,8 +1,11 @@
+import 'mojibake.dart';
 import 'tags.dart';
 
-/// Telegram channels stamp themselves into the tags of the songs they share:
-/// "Song @SomeChannel", "Artist | t.me/somechannel", "Album (Join @channel)".
-/// This takes those stamps out again.
+/// Telegram channels stamp themselves into the tags of the songs they share
+/// ("Song @SomeChannel", "Artist | t.me/somechannel"), and download sites do
+/// the same ("Song (Downloaded from Music-Site.com)"). This takes those stamps
+/// out again, along with video leftovers like "(Official Audio)", and repairs
+/// garbled Persian and Arabic text.
 class TagCleaner {
   // * A Telegram username is 5-32 letters, digits or underscores, starting
   // * with a letter. The lookbehinds keep e-mail addresses and words that only
@@ -15,23 +18,48 @@ class TagCleaner {
     caseSensitive: false,
     unicode: true,
   );
-  static final _link = RegExp(r'(?:https?://|www\.)\S+', caseSensitive: false);
+  static final _link = RegExp(
+    r'(?:(?<![\p{L}\p{N}_])(?:(?:free\s+)?downloaded?\s+(?:from|at|by)|from|'
+    r'دانلود\s+از|منبع)\s*[:：\-–—]?\s*)?'
+    r'(?:(?:https?://|www\.)\S+|(?<![\w.@/-])([a-z0-9][a-z0-9-]*\.'
+    '$_domains'
+    r')\b(?!\.\w))',
+    caseSensitive: false,
+    unicode: true,
+  );
+
+  // * Endings that are rarely part of a real name, so "Mr.Brightside" and
+  // * "Will.i.am" stay
+  static const _domains = '(?:com|net|org|ir|info|xyz|biz|ru|fm|cc|tv|io)';
+
+  /// What video rips and download sites add around a title.
+  static final _junk = RegExp(
+    r'[(\[]\s*(?:official\s+)?(?:(?:music|lyrics?|audio|hd|hq)\s+)?'
+    r'(?:video|audio|lyrics?|visuali[sz]er|hd|hq|4k|high\s+quality)\s*[)\]]'
+    r'|\b\d{2,3}\s*kbps\b'
+    r'|^\s*دانلود(?:\s+آهنگ)?\s+(?:جدید\s+)?',
+    caseSensitive: false,
+    unicode: true,
+  );
   static final _emptyBrackets = RegExp(r'\(\s*\)|\[\s*\]|\{\s*\}|<\s*>|«\s*»');
   static final _separatorRun = RegExp(r'\s*([\-–—|•·])\s*(?:[\-–—|•·]\s*)+');
   static final _edges = RegExp(r'^[\s\-–—|•·:_~/\\,]+|[\s\-–—|•·:_~/\\,]+$');
   static final _spaces = RegExp(r'\s{2,}');
 
-  /// [value] without channel stamps or links. Empty if nothing else was left.
-  static String clean(String value) => value
+  /// [value] without channel stamps, links or junk, and with garbled text
+  /// repaired. Empty if nothing else was left.
+  static String clean(String value) => (repairMojibake(value) ?? value)
       .replaceAll(_stamp, ' ')
       .replaceAll(_link, ' ')
+      .replaceAll(_junk, ' ')
       .replaceAll(_emptyBrackets, ' ')
       .replaceAllMapped(_separatorRun, (m) => ' ${m[1]} ')
       .replaceAll(_spaces, ' ')
       .replaceAll(_edges, '')
       .trim();
 
-  /// The channels stamped into [value], as "@name".
+  /// The channels and websites stamped into [value], as "@name" or
+  /// "site.com".
   static List<String> channels(String value) => [
         for (final m in _stamp.allMatches(value))
           if (m[1] != null)
@@ -40,6 +68,8 @@ class TagCleaner {
             '@${m[2]!.split('/').first}'
           else
             't.me link',
+        for (final m in _link.allMatches(value))
+          if (m[1] case final site?) site,
       ];
 
   /// The edit that cleans one song's tags, or null when they're already clean.

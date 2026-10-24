@@ -7,7 +7,7 @@ import '../../../constants/styles_manager.dart';
 import '../../../constants/values_manager.dart';
 import '../../navigation.dart';
 
-/// The Telegram channels that stamped their names into the library's tags,
+/// The channels and websites that stamped their names into the library's tags,
 /// and the way to take them out.
 class TidyCard extends StatelessWidget {
   final LibraryState state;
@@ -34,8 +34,8 @@ class TidyCard extends StatelessWidget {
           AppGap.h4,
           Text(
             channels.isEmpty
-                ? 'Their titles hold the artist too, like "Artist - Song".'
-                : 'Telegram channels left their names in the tags.',
+                ? 'Their text is garbled, or the title holds the artist too.'
+                : 'Channels and websites left their names in the tags.',
             style: TextStyles.getRegularStyle(
               fontSize: FontSize.s14,
               color: ColorManager.secondaryText,
