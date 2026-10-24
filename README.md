@@ -48,9 +48,11 @@ songs. But those files arrive with the channel's name stamped into them
 or with no tags at all and a file name like `Artist - Title.mp3`. Stash plays
 them and cleans them up.
 
-- **Tidy up.** Stash finds every song with a channel stamp, shows each tag
-  before and after, and cleans them all after one OK from Android. Files with
-  no artist named `Artist - Title` are split into the two.
+- **Tidy up.** Stash finds every song with a channel or website stamp,
+  leftovers like `(Official Audio)` or `320kbps`, or garbled Persian and
+  Arabic text (`ÓáÇã` instead of `سلام`). It shows each tag before and after,
+  and cleans them all after one OK from Android. Files with no artist named
+  `Artist - Title` are split into the two.
 - **Tag editor.** Title, artist, album, year, genre, lyrics and cover, for
   MP3, FLAC, Ogg Vorbis, Opus and M4A. Stash writes the tags itself and keeps
   the ones it doesn't know about. When the new tags fit in the old space,

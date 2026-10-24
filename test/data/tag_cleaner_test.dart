@@ -15,6 +15,14 @@ void main() {
       'کانال: @PersianMusic': '',
       'خواننده | https://t.me/xyz': 'خواننده',
       'Live www.example.com': 'Live',
+      'Song (Downloaded from Music-Site.com)': 'Song',
+      'Song | MusicSite.ir': 'Song',
+      'Title [Official Music Video]': 'Title',
+      'Title (Lyrics) 320kbps': 'Title',
+      'Title (HD)': 'Title',
+      'دانلود آهنگ امیر بی گزند': 'امیر بی گزند',
+      'آهنگ زیبا (دانلود از Ahang.ir)': 'آهنگ زیبا',
+      'ÓáÇã @PersianMusic': 'سلام',
     };
     cases.forEach((input, expected) =>
         expect(TagCleaner.clean(input), expected, reason: input));
@@ -29,6 +37,12 @@ void main() {
       'mail me@example.com',
       'Rock - Live',
       'Anti-Hero',
+      'Mr.Brightside',
+      'Will.i.am',
+      'Video Games',
+      'Audio (Live)',
+      'Radio Ga Ga',
+      'From Me to You',
     ]) {
       expect(TagCleaner.clean(title), title, reason: title);
     }
@@ -39,6 +53,8 @@ void main() {
       TagCleaner.channels('Song @MusicArchive t.me/NightTunes t.me/+AbCd'),
       ['@MusicArchive', '@NightTunes', 't.me link'],
     );
+    expect(TagCleaner.channels('Song (Downloaded from Music-Site.com)'),
+        ['Music-Site.com']);
     expect(TagCleaner.channels('Clean title'), isEmpty);
   });
 
@@ -65,5 +81,13 @@ void main() {
 
     final kept = TagCleaner.fixFor(title: 'Rock - Live', artist: 'Band');
     expect(kept, isNull);
+  });
+
+  test('repairs garbled artists and albums too', () {
+    final fix = TagCleaner.fixFor(
+        title: 'ÇãíÑ Èí \x90ÒäÏ', artist: 'ãÍÓä \x8dÇæÔí', album: 'Single')!;
+    expect(fix.title, 'امیر بی گزند');
+    expect(fix.artist, 'محسن چاوشی');
+    expect(fix.album, isNull);
   });
 }
