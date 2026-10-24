@@ -6,31 +6,33 @@ import '../../../../constants/values_manager.dart';
 
 class LargeAlbumArtImage extends StatelessWidget {
   final Uint8List? imageData;
+
+  /// Width and height of the image. When null the image fills its parent,
+  /// e.g. inside an [AspectRatio] on the player screen.
+  final double? size;
   const LargeAlbumArtImage({
     super.key,
     required this.imageData,
+    this.size = AppSize.s162,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        borderRadius: BorderRadius.all(AppRadius.rad12),
-      ),
-      child: imageData == null
-          ? ClipRRect(
-              borderRadius: const BorderRadius.all(AppRadius.rad12),
-              child: Image.asset(
+    return SizedBox(
+      width: size,
+      height: size,
+      child: ClipRRect(
+        borderRadius: const BorderRadius.all(AppRadius.rad12),
+        child: imageData == null
+            ? Image.asset(
                 AssetsManager.defaultSongThumbnail,
-                width: AppSize.s162,
-                height: AppSize.s162,
+                fit: BoxFit.cover,
+              )
+            : Image.memory(
+                imageData!,
+                fit: BoxFit.cover,
               ),
-            )
-          : Image.memory(
-              imageData!,
-              width: AppSize.s162,
-              height: AppSize.s162,
-            ),
+      ),
     );
   }
 }

@@ -10,21 +10,45 @@ class TextStyles {
     FontWeight fontWeight,
     Color color,
     double height,
+    double letterSpacingFactor,
     List<Shadow> shadows,
   ) =>
       TextStyle(
-          fontSize: fontSize,
-          fontFamily: fontFamily,
-          fontWeight: fontWeight,
-          color: color,
-          height: height,
-          shadows: shadows);
+        fontSize: fontSize,
+        fontFamily: fontFamily,
+        fontWeight: fontWeight,
+        color: color,
+        height: height,
+        // * Matches how Figma places text inside its line height
+        leadingDistribution: TextLeadingDistribution.even,
+        letterSpacing: fontSize * letterSpacingFactor,
+        shadows: shadows,
+      );
+
+  // * light style
+  static TextStyle getLightStyle({
+    double fontSize = FontSize.s12,
+    Color color = ColorManager.white,
+    double height = FontHeight.h1_3,
+    double letterSpacing = FontLetterSpacing.tight,
+    List<Shadow>? shadows,
+  }) =>
+      _getTextStyle(
+        fontSize,
+        FontConstants.fontFamily,
+        FontWeightManager.light,
+        color,
+        height,
+        letterSpacing,
+        shadows ?? [],
+      );
 
   // * regular style
   static TextStyle getRegularStyle({
     double fontSize = FontSize.s12,
     Color color = ColorManager.white,
-    double height = FontHeight.h1,
+    double height = FontHeight.h1_3,
+    double letterSpacing = FontLetterSpacing.tight,
     List<Shadow>? shadows,
   }) =>
       _getTextStyle(
@@ -33,6 +57,25 @@ class TextStyles {
         FontWeightManager.regular,
         color,
         height,
+        letterSpacing,
+        shadows ?? [],
+      );
+
+  // * medium style
+  static TextStyle getMediumStyle({
+    double fontSize = FontSize.s12,
+    Color color = ColorManager.white,
+    double height = FontHeight.h1_3,
+    double letterSpacing = FontLetterSpacing.tight,
+    List<Shadow>? shadows,
+  }) =>
+      _getTextStyle(
+        fontSize,
+        FontConstants.fontFamily,
+        FontWeightManager.medium,
+        color,
+        height,
+        letterSpacing,
         shadows ?? [],
       );
 
@@ -40,7 +83,8 @@ class TextStyles {
   static TextStyle getSemiBoldStyle({
     double fontSize = FontSize.s12,
     Color color = ColorManager.white,
-    double height = FontHeight.h1,
+    double height = FontHeight.h1_3,
+    double letterSpacing = FontLetterSpacing.tight,
     List<Shadow>? shadows,
   }) =>
       _getTextStyle(
@@ -49,6 +93,7 @@ class TextStyles {
         FontWeightManager.semiBold,
         color,
         height,
+        letterSpacing,
         shadows ?? [],
       );
 
@@ -56,7 +101,8 @@ class TextStyles {
   static TextStyle getBoldStyle({
     double fontSize = FontSize.s16,
     Color color = ColorManager.white,
-    double height = FontHeight.h1,
+    double height = FontHeight.h1_3,
+    double letterSpacing = FontLetterSpacing.tight,
     List<Shadow>? shadows,
   }) =>
       _getTextStyle(
@@ -65,6 +111,7 @@ class TextStyles {
         FontWeightManager.bold,
         color,
         height,
+        letterSpacing,
         shadows ?? [],
       );
 }

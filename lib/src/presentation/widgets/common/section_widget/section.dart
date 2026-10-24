@@ -13,13 +13,16 @@ class SectionWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      child: Column(children: [
-        // * Header of Section
-        header,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // * Header of Section
+          header,
 
-        // * Child of Section
-        if (slot != null) slot!,
-      ]),
+          // * Child of Section
+          if (slot != null) slot!,
+        ],
+      ),
     );
   }
 }

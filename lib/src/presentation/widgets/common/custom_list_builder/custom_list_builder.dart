@@ -52,7 +52,7 @@ class CustomListBuilder extends StatelessWidget {
             : const NeverScrollableScrollPhysics(),
         clipBehavior: Clip.none,
         itemCount: itemCount ?? widgetList.length,
-        controller: scrollController ?? ScrollController(),
+        controller: scrollController,
         padding: listPadding ?? const EdgeInsets.fromLTRB(16, 0, 16, 2),
         itemBuilder: (context, index) {
           return Padding(

@@ -13,18 +13,26 @@ class AppPadding {
   static const double p1 = 1.0;
   static const double p2 = 2.0;
   static const double p4 = 4.0;
+  static const double p5 = 5.0;
+  static const double p6 = 6.0;
   static const double p8 = 8.0;
+  static const double p10 = 10.0;
+  static const double p10_5 = 10.5;
   static const double p12 = 12.0;
   static const double p14 = 14.0;
   static const double p16 = 16.0;
   static const double p18 = 18.0;
   static const double p20 = 20.0;
   static const double p24 = 24.0;
+  static const double p28 = 28.0;
   static const double p30 = 30.0;
+  static const double p40 = 40.0;
 }
 
 class AppSize {
   static const double s0 = 0;
+  static const double s0_3 = 0.3;
+  static const double s0_5 = 0.5;
   static const double s4 = 4.0;
   static const double s8 = 8.0;
   static const double s10 = 10.0;
@@ -37,6 +45,7 @@ class AppSize {
   static const double s28 = 28.0;
   static const double s30 = 30.0;
   static const double s32 = 32.0;
+  static const double s34 = 34.0;
   static const double s36 = 36.0;
   static const double s40 = 40.0;
   static const double s48 = 48.0;
@@ -48,10 +57,13 @@ class AppSize {
   static const double s84 = 84.0;
   static const double s86 = 86.0;
   static const double s90 = 90.0;
+  static const double s100 = 100.0;
+  static const double s114 = 114.0;
   static const double s136 = 136.0;
   static const double s162 = 162.0;
   static const double s172 = 172.0;
   static const double s210 = 210.0;
+  static const double s304 = 304.0;
   static const double s390 = 390.0;
 }
 
@@ -59,13 +71,19 @@ class AppGap {
   static const w4 = SizedBox(width: AppSize.s4);
   static const w8 = SizedBox(width: AppSize.s8);
   static const w12 = SizedBox(width: AppSize.s12);
-  static const w16 = SizedBox(width: AppSize.s18);
+  static const w16 = SizedBox(width: AppSize.s16);
   static const h4 = SizedBox(height: AppSize.s4);
   static const h8 = SizedBox(height: AppSize.s8);
+  static const h10 = SizedBox(height: AppSize.s10);
   static const h12 = SizedBox(height: AppSize.s12);
   static const h16 = SizedBox(height: AppSize.s16);
   static const h20 = SizedBox(height: AppSize.s20);
+  static const h24 = SizedBox(height: AppSize.s24);
   static const h28 = SizedBox(height: AppSize.s28);
+  static const h36 = SizedBox(height: AppSize.s36);
+  static const h40 = SizedBox(height: AppSize.s40);
+  static const h48 = SizedBox(height: AppSize.s48);
+  static const h114 = SizedBox(height: AppSize.s114);
 }
 
 class AppRadius {
@@ -73,6 +91,12 @@ class AppRadius {
   static const rad12 = Radius.circular(12);
   static const rad16 = Radius.circular(16);
   static const rad999 = Radius.circular(999);
+}
+
+class AppBlur {
+  // * Figma blur radius divided by 2
+  static const double sigma2 = 2.0;
+  static const double sigma20 = 20.0;
 }
 
 class AppDuration {

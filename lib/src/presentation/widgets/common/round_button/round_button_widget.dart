@@ -17,9 +17,13 @@ class RoundButtonWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var shapeDecoration = BoxDecoration(
       borderRadius: const BorderRadius.all(AppRadius.rad999),
-      border: Border.all(width: 0.5, color: ColorManager.white),
+      border: Border.all(
+        width: AppSize.s0_5,
+        color: ColorManager.iconButtonBorder,
+      ),
     );
-    return Ink(
+    return Material(
+      type: MaterialType.transparency,
       child: InkWell(
         borderRadius: const BorderRadius.all(AppRadius.rad999),
         onTap: onTap,
@@ -27,8 +31,12 @@ class RoundButtonWidget extends StatelessWidget {
           width: AppSize.s50,
           height: AppSize.s50,
           decoration: shapeDecoration,
-          padding: const EdgeInsets.all(AppPadding.p12),
-          child: SvgPicture.asset(svgIcon),
+          alignment: Alignment.center,
+          child: SvgPicture.asset(
+            svgIcon,
+            width: AppSize.s24,
+            height: AppSize.s24,
+          ),
         ),
       ),
     );
