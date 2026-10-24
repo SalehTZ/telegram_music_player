@@ -68,9 +68,9 @@ class PlaylistsScreen extends StatelessWidget {
             ),
           for (final playlist in state.playlists) ...[
             CollectionRow(
-              cover: state.songsFor(playlist.songIds).firstOrNull,
+              cover: state.songsFor(playlist.songKeys).firstOrNull,
               title: playlist.name,
-              count: state.songsFor(playlist.songIds).length,
+              count: state.songsFor(playlist.songKeys).length,
               onTap: () => openSongList(
                 context,
                 title: playlist.name,
@@ -79,7 +79,7 @@ class PlaylistsScreen extends StatelessWidget {
                   s.playlists
                           .where((p) => p.name == playlist.name)
                           .firstOrNull
-                          ?.songIds ??
+                          ?.songKeys ??
                       const [],
                 ),
               ),

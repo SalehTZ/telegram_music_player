@@ -4,8 +4,8 @@ enum LibraryStatus { loading, needsPermission, blocked, ready, failed }
 
 class Playlist {
   final String name;
-  final List<int> songIds;
-  const Playlist(this.name, this.songIds);
+  final List<String> songKeys;
+  const Playlist(this.name, this.songKeys);
 }
 
 /// Songs grouped by artist or by folder.
@@ -21,11 +21,11 @@ class LibraryState {
   /// Newest first.
   final List<Song> songs;
 
-  /// Song ids in the order they were liked.
-  final List<int> favorites;
+  /// Song keys in the order they were liked.
+  final List<String> favorites;
 
-  /// Song ids, last played first.
-  final List<int> history;
+  /// Song keys, last played first.
+  final List<String> history;
   final List<Playlist> playlists;
 
   LibraryState({
@@ -39,8 +39,8 @@ class LibraryState {
   LibraryState copyWith({
     LibraryStatus? status,
     List<Song>? songs,
-    List<int>? favorites,
-    List<int>? history,
+    List<String>? favorites,
+    List<String>? history,
     List<Playlist>? playlists,
   }) =>
       LibraryState(
@@ -52,15 +52,16 @@ class LibraryState {
       );
 
   late final Map<int, Song> _byId = {for (final s in songs) s.id: s};
-  late final Set<int> _favorites = favorites.toSet();
+  late final Map<String, Song> _byKey = {for (final s in songs) s.key: s};
+  late final Set<String> _favorites = favorites.toSet();
 
   Song? byId(int id) => _byId[id];
-  List<Song> songsFor(Iterable<int> ids) => [
-        for (final id in ids)
-          if (_byId[id] case final song?) song
+  List<Song> songsFor(Iterable<String> keys) => [
+        for (final key in keys)
+          if (_byKey[key] case final song?) song
       ];
 
-  bool isFavorite(Song song) => _favorites.contains(song.id);
+  bool isFavorite(Song song) => _favorites.contains(song.key);
   List<Song> get favoriteSongs => songsFor(favorites.reversed);
   List<Song> get recentlyPlayed => songsFor(history);
 
@@ -128,7 +129,7 @@ class LibraryState {
         'favorites': favorites,
         'history': history,
         'playlists': [
-          for (final p in playlists) {'name': p.name, 'songs': p.songIds},
+          for (final p in playlists) {'name': p.name, 'songs': p.songKeys},
         ],
       };
 }

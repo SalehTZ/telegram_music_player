@@ -6,10 +6,12 @@ import '../support/demo_library.dart';
 void main() {
   late LibraryState state;
   setUp(() async {
+    final songs = await DemoMusicLibrary().songs();
+    String key(int id) => songs.firstWhere((s) => s.id == id).key;
     state = LibraryState(
-      songs: await DemoMusicLibrary().songs(),
-      favorites: [3, 1, 404],
-      history: [2, 999, 1],
+      songs: songs,
+      favorites: [key(3), key(1), '/storage/emulated/0/Music/gone.mp3'],
+      history: [key(2), '/storage/emulated/0/Music/gone.mp3', key(1)],
     );
   });
 

@@ -263,9 +263,9 @@ class _PlaylistPicker extends StatelessWidget {
             _Option(
               icon: Icons.queue_music_rounded,
               label: playlist.name,
-              detail: playlist.songIds.length == 1
+              detail: playlist.songKeys.length == 1
                   ? '1 song'
-                  : '${playlist.songIds.length} songs',
+                  : '${playlist.songKeys.length} songs',
               onTap: () {
                 library.addToPlaylist(playlist, song);
                 added(playlist.name);
