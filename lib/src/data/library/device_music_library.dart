@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../models/song_model.dart';
 import '../tags/id3.dart';
+import '../tags/tags.dart';
 import 'music_library.dart';
 
 /// The phone's media library, through MainActivity.java.
@@ -82,14 +83,18 @@ class DeviceMusicLibrary implements MusicLibrary {
       );
 
   @override
-  Future<Id3Tag?> readTag(Song song) async {
+  Future<SongTag?> readTag(Song song) async {
     if (!song.canEditTags) return null;
+    // * An MP3's tag is at the start, so only that much is read
     final file = await File(song.path).open();
     try {
-      final length = id3Length(await file.read(10));
-      if (length == 0) return null;
+      final length = song.format == 'MP3' ? id3Length(await file.read(10)) : 0;
+      if (length == 0) {
+        return readTags(await File(song.path).readAsBytes(),
+            format: song.format);
+      }
       await file.setPosition(0);
-      return readId3(await file.read(length));
+      return readTags(await file.read(length), format: song.format);
     } finally {
       await file.close();
     }
@@ -107,21 +112,21 @@ class DeviceMusicLibrary implements MusicLibrary {
 
   @override
   Future<void> writeTag(Song song, TagEdit edit) async {
-    // * An ID3 tag in front of any other format would damage the file
     if (!song.canEditTags) {
-      throw Id3Exception('Stash can only change MP3 files, not ${song.format}');
+      throw TagException("Stash can't change ${song.format} files");
     }
     final before = await File(song.path).readAsBytes();
-    final after = writeId3(before, edit);
-    // * When the tag kept its size only the tag is written, so the audio is
-    // * never at risk. Otherwise the whole file is rewritten.
-    final inPlace =
-        after.length == before.length && id3Length(after) == id3Length(before);
+    final after = writeTags(before, edit, format: song.format);
+    // * When the file kept its size only the bytes up to the last change are
+    // * written, so the audio after the tags is never at risk. Otherwise the
+    // * whole file is rewritten.
+    final changed =
+        after.length == before.length ? _changedUpTo(before, after) : null;
     final temp = File(
-      '${(await getTemporaryDirectory()).path}/stash-${song.id}.mp3',
+      '${(await getTemporaryDirectory()).path}/stash-${song.id}.tmp',
     );
     await temp.writeAsBytes(
-      inPlace ? Uint8List.sublistView(after, 0, id3Length(after)) : after,
+      changed == null ? after : Uint8List.sublistView(after, 0, changed),
       flush: true,
     );
     try {
@@ -129,10 +134,20 @@ class DeviceMusicLibrary implements MusicLibrary {
         'uri': song.uri,
         'path': song.path,
         'source': temp.path,
-        'truncate': !inPlace,
+        'truncate': changed == null,
       });
     } finally {
       await temp.delete();
     }
+  }
+
+  /// How many bytes from the start hold every difference between [a] and
+  /// [b], which are the same length.
+  static int _changedUpTo(Uint8List a, Uint8List b) {
+    var end = a.length;
+    while (end > 0 && a[end - 1] == b[end - 1]) {
+      end--;
+    }
+    return end;
   }
 }

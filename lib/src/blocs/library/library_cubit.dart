@@ -9,7 +9,7 @@ import '../../data/library/local_store.dart';
 import '../../data/library/music_library.dart';
 import '../../data/lyrics/lyrics.dart';
 import '../../data/models/song_model.dart';
-import '../../data/tags/id3.dart';
+import '../../data/tags/tags.dart';
 import '../../data/tags/tag_cleaner.dart';
 
 part 'library_state.dart';
@@ -174,7 +174,7 @@ class LibraryCubit extends Cubit<LibraryState> {
       if (edit.cover != null) artwork.replace(song, edit.cover);
       await refresh();
       return null;
-    } on Id3Exception catch (e) {
+    } on TagException catch (e) {
       return e.message;
     } on PlatformException catch (e) {
       return e.message ?? "Couldn't save the file.";

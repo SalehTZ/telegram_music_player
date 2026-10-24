@@ -4,13 +4,14 @@ import 'dart:typed_data';
 import 'package:stash/src/data/library/music_library.dart';
 import 'package:stash/src/data/models/song_model.dart';
 import 'package:stash/src/data/tags/id3.dart';
+import 'package:stash/src/data/tags/tags.dart';
 
 const _telegram = '/storage/emulated/0/Music/Telegram';
 const _downloads = '/storage/emulated/0/Download/Telegram';
 const _music = '/storage/emulated/0/Music';
 
 /// A small library the way Telegram leaves it: channel names stamped into
-/// the tags, a file named "Artist - Title" with no tags at all, and a FLAC
+/// the tags, a file named "Artist - Title" with no tags at all, and a WMA
 /// Stash can't change. MP3s carry real ID3 tags, so edits run the real
 /// writer.
 class DemoMusicLibrary implements MusicLibrary {
@@ -88,7 +89,7 @@ class DemoMusicLibrary implements MusicLibrary {
           'Lover @NightTunes', 178),
       song(_music, 'Happier Than Ever.mp3', 'Happier Than Ever',
           'Billie Eilish', 'Happier Than Ever', 298),
-      song(_telegram, 'Instant Crush.flac', 'Instant Crush @MusicArchive',
+      song(_telegram, 'Instant Crush.wma', 'Instant Crush @MusicArchive',
           'Daft Punk', 'Random Access Memories', 337),
       song('$_music/Stash', 'Starboy.mp3', 'Starboy', 'The Weeknd', 'Starboy',
           230),
@@ -126,7 +127,7 @@ class DemoMusicLibrary implements MusicLibrary {
   Future<Uint8List?> artwork(Song song, int size) async => covers[song.id];
 
   @override
-  Future<Id3Tag?> readTag(Song song) async {
+  Future<SongTag?> readTag(Song song) async {
     final file = _files[song.id];
     return file == null ? null : readId3(file);
   }
@@ -140,7 +141,7 @@ class DemoMusicLibrary implements MusicLibrary {
   @override
   Future<void> writeTag(Song song, TagEdit edit) async {
     final file = _files[song.id];
-    if (file == null) throw const Id3Exception('Not an MP3');
+    if (file == null) throw const TagException('Not an MP3');
     final written = writeId3(file, edit);
     _files[song.id] = written;
     final tag = readId3(written)!;

@@ -1,62 +1,30 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-/// Thrown when a file's tag can't be read or safely rewritten.
-class Id3Exception implements Exception {
-  final String message;
-  const Id3Exception(this.message);
-
-  @override
-  String toString() => message;
-}
-
-/// Changes to a song's tags. A null field stays as it is, an empty string
-/// removes it, and a cover replaces every picture in the tag.
-class TagEdit {
-  final String? title;
-  final String? artist;
-  final String? album;
-  final String? year;
-  final String? genre;
-  final String? lyrics;
-  final Uint8List? cover;
-
-  const TagEdit({
-    this.title,
-    this.artist,
-    this.album,
-    this.year,
-    this.genre,
-    this.lyrics,
-    this.cover,
-  });
-
-  bool get isEmpty =>
-      title == null &&
-      artist == null &&
-      album == null &&
-      year == null &&
-      genre == null &&
-      lyrics == null &&
-      cover == null;
-}
+import 'tags.dart';
 
 /// The ID3v2.3 or v2.4 tag at the start of an MP3 file.
-class Id3Tag {
+class Id3Tag implements SongTag {
   final int version;
   final List<_Frame> _frames;
   Id3Tag._(this.version, this._frames);
 
+  @override
   String? get title => _text('TIT2');
+  @override
   String? get artist => _text('TPE1');
+  @override
   String? get album => _text('TALB');
+  @override
   String? get genre => _text('TCON');
+  @override
   String? get year {
     final value = _text('TYER') ?? _text('TDRC');
     return value == null || value.length <= 4 ? value : value.substring(0, 4);
   }
 
   /// Unsynchronised lyrics (USLT), the first frame that has text.
+  @override
   String? get lyrics {
     for (final frame in _readable('USLT')) {
       final d = frame.data;
@@ -70,7 +38,7 @@ class Id3Tag {
     return null;
   }
 
-  /// The front cover, or the first picture when none is marked as the front.
+  @override
   Uint8List? get cover {
     Uint8List? first;
     for (final frame in _readable('APIC')) {
@@ -118,19 +86,19 @@ class _Frame {
 const _headerSize = 10;
 
 /// Reads the ID3v2 tag at the start of [file], or returns null if there is
-/// none. Throws an [Id3Exception] for tags it can't rewrite safely.
+/// none. Throws an [TagException] for tags it can't rewrite safely.
 Id3Tag? readId3(Uint8List file) {
   if (!_hasTag(file)) return null;
   final version = file[3];
   if (version != 3 && version != 4) {
-    throw Id3Exception('ID3v2.$version tags are not supported');
+    throw TagException('ID3v2.$version tags are not supported');
   }
   final flags = file[5];
   if (flags & 0x80 != 0) {
-    throw const Id3Exception('Unsynchronised ID3 tags are not supported');
+    throw const TagException('Unsynchronised ID3 tags are not supported');
   }
   final end = _headerSize + _syncsafe(file, 6);
-  if (end > file.length) throw const Id3Exception('The tag is cut short');
+  if (end > file.length) throw const TagException('The tag is cut short');
 
   var pos = _headerSize;
   if (flags & 0x40 != 0) {
@@ -140,12 +108,12 @@ Id3Tag? readId3(Uint8List file) {
   while (pos + _headerSize <= end && file[pos] != 0) {
     final idBytes = file.sublist(pos, pos + 4);
     if (!idBytes.every((c) => _isIdChar(c))) {
-      throw const Id3Exception('The tag is damaged');
+      throw const TagException('The tag is damaged');
     }
     final size =
         version == 4 ? _syncsafe(file, pos + 4) : _int32(file, pos + 4);
     final next = pos + _headerSize + size;
-    if (next > end) throw const Id3Exception('The tag is damaged');
+    if (next > end) throw const TagException('The tag is damaged');
     frames.add(_Frame(
       ascii.decode(idBytes),
       file[pos + 9],
@@ -202,7 +170,7 @@ Uint8List writeId3(Uint8List file, TagEdit edit) {
   }
   final cover = edit.cover;
   if (cover != null && cover.isNotEmpty) {
-    final mime = _isPng(cover) ? 'image/png' : 'image/jpeg';
+    final mime = isPng(cover) ? 'image/png' : 'image/jpeg';
     body.add(
         _frame('APIC', [0, ...ascii.encode(mime), 0, 3, 0, ...cover], version));
   }
@@ -234,13 +202,6 @@ int id3Length(Uint8List f) {
 }
 
 bool _isIdChar(int c) => (c >= 0x41 && c <= 0x5a) || (c >= 0x30 && c <= 0x39);
-
-bool _isPng(Uint8List b) =>
-    b.length > 4 &&
-    b[0] == 0x89 &&
-    b[1] == 0x50 &&
-    b[2] == 0x4e &&
-    b[3] == 0x47;
 
 int _syncsafe(Uint8List b, int o) =>
     (b[o] & 0x7f) << 21 |
@@ -305,7 +266,7 @@ String _decode(int encoding, List<int> bytes) {
               : bytes[i + 1] << 8 | bytes[i],
       ]);
     default:
-      throw Id3Exception('Unknown text encoding $encoding');
+      throw TagException('Unknown text encoding $encoding');
   }
 }
 

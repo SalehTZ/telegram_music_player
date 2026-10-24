@@ -10,7 +10,7 @@ import '../../../constants/values_manager.dart';
 import '../../../data/lyrics/lyrics.dart';
 import '../../../data/models/song_model.dart';
 import '../../../data/online/lyrics_search.dart';
-import '../../../data/tags/id3.dart';
+import '../../../data/tags/tags.dart';
 import '../../../data/tags/tag_cleaner.dart';
 import '../../widgets/appbar/appbar_widget.dart';
 import '../../widgets/common/page_title/page_title.dart';
@@ -213,7 +213,8 @@ class _LyricsScreenState extends State<LyricsScreen> {
             child: Text(
               song.canEditTags
                   ? 'Found on LRCLIB'
-                  : 'Found on LRCLIB. Stash can save lyrics into MP3 files only.',
+                  : "Found on LRCLIB. Stash can't save lyrics into "
+                      '${song.format} files.',
               style: TextStyles.getRegularStyle(
                 fontSize: FontSize.s14,
                 color: ColorManager.secondaryText,

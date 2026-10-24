@@ -7,7 +7,7 @@ import '../../../constants/fonts_manager.dart';
 import '../../../constants/styles_manager.dart';
 import '../../../constants/values_manager.dart';
 import '../../../data/models/song_model.dart';
-import '../../../data/tags/id3.dart';
+import '../../../data/tags/tags.dart';
 import '../../widgets/appbar/appbar_widget.dart';
 import '../../widgets/common/page_title/page_title.dart';
 import '../home_screen/tidy_card.dart';
@@ -115,7 +115,7 @@ class _TidyScreenState extends State<TidyScreen> {
               if (locked.isNotEmpty) ...[
                 AppGap.h24,
                 Text(
-                  'Not MP3, so Stash can\'t change these',
+                  "Stash can't change these files",
                   style: TextStyles.getSemiBoldStyle(fontSize: FontSize.s16),
                 ),
                 for (final song in locked)
