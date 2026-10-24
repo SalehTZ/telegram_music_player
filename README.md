@@ -86,6 +86,15 @@ Grab the latest build from **[Releases](https://github.com/SalehTZ/Stash/release
 | Platform | File |
 |---|---|
 | Android | `stash-android-arm64-v8a.apk` (most phones), `armeabi-v7a` for older ones, `x86_64` for emulators and Chromebooks |
+| Linux | `stash-linux-x86_64.AppImage` (runs on most distros, brings its own libmpv), `stash-linux-amd64.deb` (Debian, Ubuntu, Mint), `stash-linux-x64.tar.gz` |
+| Windows | `stash-windows-x64-setup.exe` (installs without admin rights), `stash-windows-x64.msi` (for everyone on the PC), `stash-windows-x64.zip` (portable) |
+| macOS | `stash-macos.dmg` or `stash-macos.zip`, for Apple silicon and Intel |
+| iOS | `stash-ios-unsigned.ipa`, to sign while sideloading |
+
+Install the `.deb` with `sudo apt install ./stash-linux-amd64.deb` so apt pulls
+in libmpv; the tarball needs it installed already. The macOS app isn't notarized yet, so open it the
+first time with right-click > **Open**. The iOS build is unsigned and can't
+find songs yet: it's there for testing.
 
 On Android, **[add Stash to Obtainium](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22ir.salehtz.stash%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FSalehTZ%2FStash%22%2C%22author%22%3A%22SalehTZ%22%2C%22name%22%3A%22Stash%22%7D)** to get updates straight from these releases.
 
@@ -227,10 +236,14 @@ Two GitHub Actions workflows build the app:
 - **CI** (`.github/workflows/ci.yml`) runs on every push and pull request: it
   checks formatting, analyzes, runs the tests and builds one APK per CPU type,
   which you can download from the run for 14 days.
+- **Packages** (`.github/workflows/packages.yml`) builds Linux, Windows, macOS
+  and iOS and packs them with the scripts in `tool/package/`. CI runs it on
+  every push too, so the packages from any run can be downloaded for 14 days.
 - **Release** (`.github/workflows/release.yml`) runs when a version tag is
   pushed. It builds one APK per CPU type, checks that each one is signed with
-  the release key above, and publishes them with `SHA256SUMS.txt` as a GitHub
-  release.
+  the release key above, runs Packages, and publishes everything with
+  `SHA256SUMS.txt` as a GitHub release. If a desktop or iOS package fails, the
+  release still goes out with the APKs and says which files are missing.
 
 To publish a release:
 
