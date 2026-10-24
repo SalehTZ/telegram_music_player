@@ -1,0 +1,35 @@
+<!--
+  The .msi installer, built by tool/package/windows.ps1 with WiX 5:
+    wix build stash.wxs -arch x64 -d Version=0.3.0 -bindpath bundle=<release folder>
+  It installs for everyone, so it fits machines managed with Group Policy or
+  Intune. Upgrades replace the old version in place.
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="Stash" Manufacturer="SalehTZ" Version="$(Version)"
+           UpgradeCode="185E403D-8132-4DF2-A44E-5D291330363C" Scope="perMachine">
+    <MajorUpgrade DowngradeErrorMessage="A newer version of Stash is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <Icon Id="StashIcon" SourceFile="..\runner\resources\app_icon.ico" />
+    <Property Id="ARPPRODUCTICON" Value="StashIcon" />
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/SalehTZ/Stash" />
+
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="Stash" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Component Id="StartMenuShortcut">
+        <Shortcut Name="Stash" Target="[INSTALLFOLDER]stash.exe"
+                  WorkingDirectory="INSTALLFOLDER" Icon="StashIcon" />
+        <RegistryValue Root="HKMU" Key="Software\SalehTZ\Stash" Name="StartMenuShortcut"
+                       Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </StandardDirectory>
+
+    <Feature Id="Main">
+      <Files Directory="INSTALLFOLDER" Include="!(bindpath.bundle)\**" />
+      <ComponentRef Id="StartMenuShortcut" />
+    </Feature>
+  </Package>
+</Wix>
