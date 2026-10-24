@@ -156,7 +156,11 @@ class LibraryCubit extends Cubit<LibraryState> {
     List<Song> songs, {
     required void Function(int done) onProgress,
   }) async {
-    if (!await library.requestWriteAccess(songs)) return null;
+    try {
+      if (!await library.requestWriteAccess(songs)) return null;
+    } on PlatformException {
+      return null;
+    }
     final failed = <Song>[];
     for (final (i, song) in songs.indexed) {
       final fix = state.fixes[song.id];
