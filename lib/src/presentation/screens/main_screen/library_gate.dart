@@ -58,7 +58,7 @@ class EmptyLibrary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (context.read<LibraryCubit>().pickedFolders != null) {
+    if (context.read<LibraryCubit>().pickedFolders != null && canPickFolders) {
       return _Message(
         title: 'No songs yet',
         body: 'Songs in your Music folder and in Telegram Desktop\'s '

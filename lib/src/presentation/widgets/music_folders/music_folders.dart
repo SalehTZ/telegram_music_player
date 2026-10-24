@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +11,11 @@ import '../../../constants/fonts_manager.dart';
 import '../../../constants/styles_manager.dart';
 import '../../../constants/values_manager.dart';
 import '../../../utils/song_text.dart';
+
+/// Whether the system lets Stash ask for a folder and take dropped files:
+/// computers, not iOS.
+final canPickFolders =
+    Platform.isLinux || Platform.isWindows || Platform.isMacOS;
 
 /// Asks for a folder and adds it to the ones Stash looks in.
 Future<void> addMusicFolder(BuildContext context) async {
@@ -71,11 +78,13 @@ class MusicFolders extends StatelessWidget {
               ],
             ),
           ),
-        AppGap.h12,
-        OutlinedButton(
-          onPressed: () => addMusicFolder(context),
-          child: const Text('Add a folder'),
-        ),
+        if (canPickFolders) ...[
+          AppGap.h12,
+          OutlinedButton(
+            onPressed: () => addMusicFolder(context),
+            child: const Text('Add a folder'),
+          ),
+        ],
       ],
     );
   }
@@ -97,7 +106,7 @@ class _DropToAddState extends State<DropToAdd> {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<LibraryCubit>();
-    if (cubit.pickedFolders == null) return widget.child;
+    if (cubit.pickedFolders == null || !canPickFolders) return widget.child;
     return DropTarget(
       onDragEntered: (_) => setState(() => _over = true),
       onDragExited: (_) => setState(() => _over = false),

@@ -1,0 +1,173 @@
+name: Packages
+
+# Builds and packs the desktop and iOS apps. CI calls it on every push to
+# check that packaging still works, and Release calls it with the tag's
+# version. Each job uploads its files as an artifact named stash-<platform>.
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: Version name, like 0.3.0 or v0.3.0. Empty uses pubspec.yaml's.
+        type: string
+        default: ""
+
+env:
+  # Keep in sync with the Flutter version used to create pubspec.lock.
+  FLUTTER_VERSION: "3.47.8"
+  VERSION: ${{ inputs.version }}
+
+jobs:
+  linux:
+    name: Linux (tar.gz, deb, AppImage)
+    # * The oldest supported Ubuntu, so the glibc it links against is old
+    # enough for Debian 12 and other older distros
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install build tools and libmpv
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev \
+            libmpv-dev libfuse2 zsync xvfb
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Version
+        shell: bash
+        run: echo "VERSION=${VERSION#v}" >> "$GITHUB_ENV"
+
+      - name: Build
+        run: flutter build linux --release ${VERSION:+--build-name "$VERSION" --dart-define=APP_VERSION="$VERSION"}
+
+      - name: Package
+        run: tool/package/linux.sh
+
+      # Starts the AppImage for a few seconds; it has to still be running
+      - name: Smoke test AppImage
+        run: |
+          set +e
+          timeout 15 xvfb-run -a dist/stash-linux-x86_64.AppImage
+          status=$?
+          if [ "$status" != 124 ]; then
+            echo "::error::The AppImage exited with $status before the timeout."
+            exit 1
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stash-linux
+          path: dist/*
+          retention-days: 14
+
+  windows:
+    name: Windows (zip, exe, msi)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Version
+        shell: bash
+        run: echo "VERSION=${VERSION#v}" >> "$GITHUB_ENV"
+
+      - name: Build
+        shell: bash
+        run: flutter build windows --release ${VERSION:+--build-name "$VERSION" --dart-define=APP_VERSION="$VERSION"}
+
+      - name: Package
+        run: tool/package/windows.ps1
+
+      # Installs the .msi and starts Stash from it for a few seconds
+      - name: Smoke test installer
+        run: |
+          $msi = Resolve-Path dist\stash-windows-x64.msi
+          $install = Start-Process msiexec -ArgumentList "/i `"$msi`" /qn /l*v msi.log" -Wait -PassThru
+          if ($install.ExitCode) { Get-Content msi.log -Tail 40; throw "msiexec failed ($($install.ExitCode))" }
+          $app = Start-Process "$env:ProgramFiles\Stash\stash.exe" -PassThru
+          Start-Sleep 15
+          if ($app.HasExited) { throw "Stash exited with $($app.ExitCode) right after starting." }
+          Stop-Process $app
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stash-windows
+          path: dist/*
+          retention-days: 14
+
+  macos:
+    name: macOS (dmg, zip)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Version
+        shell: bash
+        run: echo "VERSION=${VERSION#v}" >> "$GITHUB_ENV"
+
+      - name: Build
+        run: flutter build macos --release ${VERSION:+--build-name "$VERSION" --dart-define=APP_VERSION="$VERSION"}
+
+      - name: Package
+        run: tool/package/macos.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stash-macos
+          path: dist/*
+          retention-days: 14
+
+  ios:
+    name: iOS (unsigned ipa)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Version
+        shell: bash
+        run: echo "VERSION=${VERSION#v}" >> "$GITHUB_ENV"
+
+      - name: Build
+        run: flutter build ios --release --no-codesign ${VERSION:+--build-name "$VERSION" --dart-define=APP_VERSION="$VERSION"}
+
+      - name: Package
+        run: tool/package/ios.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stash-ios
+          path: dist/*
+          retention-days: 14

@@ -73,85 +73,8 @@ jobs:
           path: build/app/outputs/flutter-apk/app-*-release.apk
           retention-days: 14
 
-  build-linux:
-    name: Build Linux
+  # Linux, Windows, macOS and iOS, built and packed the way releases are
+  packages:
+    name: Packages
     needs: check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: Install build tools and libmpv
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libmpv-dev
-
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: stable
-          cache: true
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Build
-        run: flutter build linux --release
-
-      - name: Upload
-        uses: actions/upload-artifact@v4
-        with:
-          name: stash-linux-x64
-          path: build/linux/x64/release/bundle
-          retention-days: 14
-
-  build-windows:
-    name: Build Windows
-    needs: check
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v5
-
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: stable
-          cache: true
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Build
-        run: flutter build windows --release
-
-      - name: Upload
-        uses: actions/upload-artifact@v4
-        with:
-          name: stash-windows-x64
-          path: build/windows/x64/runner/Release
-          retention-days: 14
-
-  build-macos:
-    name: Build macOS
-    needs: check
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v5
-
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: stable
-          cache: true
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Build
-        run: flutter build macos --release
-
-      - name: Upload
-        uses: actions/upload-artifact@v4
-        with:
-          name: stash-macos
-          path: build/macos/Build/Products/Release/Stash.app
-          retention-days: 14
+    uses: ./.github/workflows/packages.yml

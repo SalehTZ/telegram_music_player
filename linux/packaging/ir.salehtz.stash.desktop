@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Stash
+Comment=A music player for the songs you collect on Telegram
+Exec=stash
+Icon=ir.salehtz.stash
+Terminal=false
+Categories=AudioVideo;Audio;Player;
+Keywords=music;player;telegram;mp3;flac;
+StartupWMClass=stash
