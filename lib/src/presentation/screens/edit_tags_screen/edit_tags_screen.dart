@@ -12,6 +12,7 @@ import '../../../data/library/artwork_cache.dart';
 import '../../../data/models/song_model.dart';
 import '../../../data/tags/tags.dart';
 import '../../../data/tags/tag_cleaner.dart';
+import '../../layout.dart';
 import '../../widgets/appbar/appbar_widget.dart';
 import '../../widgets/common/artwork/artwork_image.dart';
 import '../../widgets/common/page_title/page_title.dart';
@@ -111,8 +112,10 @@ class _EditTagsScreenState extends State<EditTagsScreen> {
         .join(' ');
     final cover = await Navigator.of(context).push<Uint8List>(
       MaterialPageRoute(
-        builder: (_) => CoverSearchScreen(
-          query: query.isEmpty ? TagCleaner.clean(_title.text) : query,
+        builder: (_) => ReadableWidth(
+          child: CoverSearchScreen(
+            query: query.isEmpty ? TagCleaner.clean(_title.text) : query,
+          ),
         ),
       ),
     );

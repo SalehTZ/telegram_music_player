@@ -20,14 +20,40 @@ import '../../widgets/common/artwork/artwork_image.dart';
 import '../../widgets/common/progress_bar/song_progress_bar.dart';
 import '../../widgets/song_options/song_options_sheet.dart';
 
-class PlayerScreen extends StatefulWidget {
+class PlayerScreen extends StatelessWidget {
   const PlayerScreen({super.key});
 
   @override
-  State<PlayerScreen> createState() => _PlayerScreenState();
+  Widget build(BuildContext context) {
+    return BlocBuilder<PlayerCubit, PlayerState>(
+      buildWhen: (a, b) => !identical(a.song, b.song),
+      builder: (context, state) {
+        final song = state.song;
+        return Scaffold(
+          appBar: AppBarWidget(
+            isMainScreen: false,
+            hasSecondAction: song != null,
+            onSecondActionTap:
+                song == null ? null : () => showSongOptions(context, song),
+          ),
+          body: const SafeArea(top: false, child: NowPlaying()),
+        );
+      },
+    );
+  }
 }
 
-class _PlayerScreenState extends State<PlayerScreen> {
+/// The playing song's cover, controls, progress and lyrics: the player page
+/// on a phone, and the player panel in a wide window. Empty when nothing
+/// plays.
+class NowPlaying extends StatefulWidget {
+  const NowPlaying({super.key});
+
+  @override
+  State<NowPlaying> createState() => _NowPlayingState();
+}
+
+class _NowPlayingState extends State<NowPlaying> {
   int? _lyricsSongId;
   Lyrics? _lyrics;
 
@@ -55,93 +81,80 @@ class _PlayerScreenState extends State<PlayerScreen> {
       },
       builder: (context, state) {
         final song = state.song;
-        if (song == null) {
-          return const Scaffold(appBar: AppBarWidget(isMainScreen: false));
-        }
+        if (song == null) return const SizedBox.shrink();
         final player = context.read<PlayerCubit>();
-        return Scaffold(
-          appBar: AppBarWidget(
-            isMainScreen: false,
-            hasSecondAction: true,
-            onSecondActionTap: () => showSongOptions(context, song),
-          ),
-          body: SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppPadding.p20),
-              child: Column(
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppPadding.p20),
+          child: Column(
+            children: [
+              AppGap.h20,
+              // * Album art, shrinks on short screens
+              Flexible(
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: ArtworkImage(
+                    song: song,
+                    quality: ArtworkSize.large,
+                    borderRadius: const BorderRadius.all(AppRadius.rad12),
+                  ),
+                ),
+              ),
+
+              AppGap.h20,
+              // * Song name and artist, the heart balanced by an equal
+              // * space on the left so the title stays centred
+              Row(
                 children: [
-                  AppGap.h20,
-                  // * Album art, shrinks on short screens
-                  Flexible(
-                    child: AspectRatio(
-                      aspectRatio: 1,
-                      child: ArtworkImage(
-                        song: song,
-                        quality: ArtworkSize.large,
-                        borderRadius: const BorderRadius.all(AppRadius.rad12),
-                      ),
+                  const SizedBox(width: AppSize.s48),
+                  Expanded(
+                    child: Text(
+                      song.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: TextStyles.getBoldStyle(fontSize: FontSize.s24),
                     ),
                   ),
-
-                  AppGap.h20,
-                  // * Song name and artist, the heart balanced by an equal
-                  // * space on the left so the title stays centred
-                  Row(
-                    children: [
-                      const SizedBox(width: AppSize.s48),
-                      Expanded(
-                        child: Text(
-                          song.title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                          style:
-                              TextStyles.getBoldStyle(fontSize: FontSize.s24),
-                        ),
-                      ),
-                      _FavoriteButton(song: song),
-                    ],
-                  ),
-                  AppGap.h12,
-                  Text(
-                    song.artistOrUnknown,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: TextStyles.getRegularStyle(
-                      fontSize: FontSize.s18,
-                      color: ColorManager.secondaryText,
-                    ),
-                  ),
-
-                  AppGap.h40,
-                  _PlayerControls(state: state, player: player),
-
-                  AppGap.h40,
-                  StreamBuilder<Duration>(
-                    stream: player.position,
-                    initialData: player.positionNow,
-                    builder: (context, snapshot) => _Progress(
-                      position: snapshot.data ?? Duration.zero,
-                      duration: song.duration,
-                      lyrics: _lyrics,
-                      onSeek: player.seek,
-                      onOpenLyrics: () => openLyrics(
-                        context,
-                        song,
-                        _lyrics,
-                        onFound: (found) {
-                          if (mounted && _lyricsSongId == song.id) {
-                            setState(() => _lyrics = found);
-                          }
-                        },
-                      ),
-                    ),
-                  ),
+                  _FavoriteButton(song: song),
                 ],
               ),
-            ),
+              AppGap.h12,
+              Text(
+                song.artistOrUnknown,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: TextStyles.getRegularStyle(
+                  fontSize: FontSize.s18,
+                  color: ColorManager.secondaryText,
+                ),
+              ),
+
+              AppGap.h40,
+              _PlayerControls(state: state, player: player),
+
+              AppGap.h40,
+              StreamBuilder<Duration>(
+                stream: player.position,
+                initialData: player.positionNow,
+                builder: (context, snapshot) => _Progress(
+                  position: snapshot.data ?? Duration.zero,
+                  duration: song.duration,
+                  lyrics: _lyrics,
+                  onSeek: player.seek,
+                  onOpenLyrics: () => openLyrics(
+                    context,
+                    song,
+                    _lyrics,
+                    onFound: (found) {
+                      if (mounted && _lyricsSongId == song.id) {
+                        setState(() => _lyrics = found);
+                      }
+                    },
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       },
