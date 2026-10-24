@@ -16,6 +16,10 @@
 </p>
 
 <p align="center">
+  <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22ir.salehtz.stash%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FSalehTZ%2FStash%22%2C%22author%22%3A%22SalehTZ%22%2C%22name%22%3A%22Stash%22%7D"><img alt="Get it on Obtainium" src="docs/badge_obtainium.png" height="54"></a>
+</p>
+
+<p align="center">
   <a href="https://github.com/SalehTZ/Stash/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/SalehTZ/Stash?style=flat&logo=github&color=f8e444"></a>
   <a href="https://github.com/SalehTZ/Stash/releases"><img alt="Downloads" src="https://img.shields.io/github/downloads/SalehTZ/Stash/total?label=downloads&logo=github"></a>
   <a href="https://github.com/SalehTZ/Stash/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/SalehTZ/Stash/ci.yml?branch=main&label=CI&logo=githubactions&logoColor=white"></a>
@@ -76,6 +80,8 @@ Grab the latest build from **[Releases](https://github.com/SalehTZ/Stash/release
 | Platform | File |
 |---|---|
 | Android | `stash-android-arm64-v8a.apk` (most phones), `armeabi-v7a` for older ones, `x86_64` for emulators and Chromebooks |
+
+On Android, **[add Stash to Obtainium](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22ir.salehtz.stash%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FSalehTZ%2FStash%22%2C%22author%22%3A%22SalehTZ%22%2C%22name%22%3A%22Stash%22%7D)** to get updates straight from these releases.
 
 If you installed **v0.1.0**, uninstall it. That preview was still called Telegram
 Music Player and Android sees it as a different app, so Stash won't replace it.
