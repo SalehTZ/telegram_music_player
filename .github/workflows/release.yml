@@ -1,6 +1,6 @@
 name: Release
 
-# Push a tag like v0.2.0 to build the APK and publish it as a GitHub release.
+# Push a tag like v0.2.0 to build the APKs and publish them as a GitHub release.
 on:
   push:
     tags: ["v*"]
@@ -11,15 +11,18 @@ permissions:
 env:
   # Keep in sync with the Flutter version used to create pubspec.lock.
   FLUTTER_VERSION: "3.16.9"
+  # SHA-256 of the release certificate, shared with Snag and published in
+  # README.md. Releases signed with any other key are refused.
+  RELEASE_CERT_SHA256: a5350aaa8abc946cc86836b770f66170d3efc2ae7e6c15b3dd0a3ce6a6aa138d
 
 jobs:
   release:
     name: Build and publish release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
@@ -37,39 +40,66 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Set up release signing
+      # The release key lives in GitHub encrypted secrets (the same ones as
+      # Snag), never in the repo.
+      - name: Release signing key
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           if [ -z "$KEYSTORE_BASE64" ]; then
-            echo "::warning::ANDROID_KEYSTORE_BASE64 is not set, so the APK is signed with a temporary debug key and can't update an earlier install."
-            exit 0
+            echo "::error::Releases must be signed. Add the ANDROID_KEYSTORE_* secrets (the same ones as Snag)."
+            exit 1
           fi
-          echo "$KEYSTORE_BASE64" | base64 --decode > android/app/upload-keystore.jks
-          {
-            echo "storeFile=upload-keystore.jks"
-            echo "storePassword=$KEYSTORE_PASSWORD"
-            echo "keyAlias=$KEY_ALIAS"
-            echo "keyPassword=$KEY_PASSWORD"
-          } > android/key.properties
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+          umask 077
+          printf 'storeFile=%s\nstorePassword=%s\nkeyPassword=%s\nkeyAlias=%s\n' \
+            "$RUNNER_TEMP/release.jks" "$KEYSTORE_PASSWORD" "$KEYSTORE_PASSWORD" "$KEY_ALIAS" \
+            > android/key.properties
 
-      - name: Build APK
+      - name: Build APKs
         run: |
-          flutter build apk --release \
+          flutter build apk --release --split-per-abi \
             --build-name "${GITHUB_REF_NAME#v}" \
             --build-number "$GITHUB_RUN_NUMBER"
-          mv build/app/outputs/flutter-apk/app-release.apk \
-            "telegram-music-player-$GITHUB_REF_NAME.apk"
+
+      - name: Verify signature
+        shell: bash
+        run: |
+          APKSIGNER=$(printf '%s\n' "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
+          echo "Using $APKSIGNER"
+          for apk in build/app/outputs/flutter-apk/app-*-release.apk; do
+            echo "== $apk"
+            "$APKSIGNER" verify --print-certs "$apk" | tee "$RUNNER_TEMP/certs.txt"
+            if ! grep -qi "$RELEASE_CERT_SHA256" "$RUNNER_TEMP/certs.txt"; then
+              echo "::error::$apk isn't signed with the release key (SHA-256 $RELEASE_CERT_SHA256)."
+              exit 1
+            fi
+          done
+
+      - name: Remove signing key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/release.jks" android/key.properties
+
+      # Stable names (no version) so links like
+      # releases/latest/download/telegram-music-player-android-arm64-v8a.apk
+      # always point at the newest build.
+      - name: Rename
+        run: |
+          mkdir dist
+          for abi in arm64-v8a armeabi-v7a x86_64; do
+            cp "build/app/outputs/flutter-apk/app-$abi-release.apk" \
+              "dist/telegram-music-player-android-$abi.apk"
+          done
+          (cd dist && sha256sum ./*.apk > SHA256SUMS.txt)
+          cat dist/SHA256SUMS.txt
 
       - name: Publish GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" \
-            "telegram-music-player-$GITHUB_REF_NAME.apk" \
+          gh release create "$GITHUB_REF_NAME" dist/* \
             --title "$GITHUB_REF_NAME" \
             --generate-notes \
             --verify-tag

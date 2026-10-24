@@ -1,34 +1,120 @@
-# Telegram Music Player
+<h1 align="center">Telegram Music Player</h1>
 
-[![CI](https://github.com/SalehTZ/telegram_music_player/actions/workflows/ci.yml/badge.svg)](https://github.com/SalehTZ/telegram_music_player/actions/workflows/ci.yml)
+<p align="center">
+  <b>All the music you saved on Telegram, in one player.</b><br>
+  A free Android music player for the songs you collect on Telegram:<br>
+  play them, fix their messy tags, find album covers and add lyrics.
+</p>
 
-A Flutter music player for Android, built around the songs you collect on
-Telegram. The goal is to gather those songs in one place, play them, and clean
-them up: fix messy tags, find or replace album covers, and add lyrics.
+<p align="center">
+  <a href="https://github.com/SalehTZ/telegram_music_player/releases"><img alt="Download" src="https://img.shields.io/github/v/release/SalehTZ/telegram_music_player?label=download&style=for-the-badge&color=5947B2"></a>
+  <a href="#support-telegram-music-player"><img alt="Donate" src="https://img.shields.io/badge/donate-%E2%99%A5-ff5c8a?style=for-the-badge"></a>
+</p>
 
-> **Status:** early development. The UI from the design is in place and runs
-> on demo data; reading your music library and real playback come next.
+<p align="center">
+  <a href="https://github.com/SalehTZ/telegram_music_player/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/SalehTZ/telegram_music_player?style=flat&logo=github&color=f8e444"></a>
+  <a href="https://github.com/SalehTZ/telegram_music_player/releases"><img alt="Downloads" src="https://img.shields.io/github/downloads/SalehTZ/telegram_music_player/total?label=downloads&logo=github"></a>
+  <a href="https://github.com/SalehTZ/telegram_music_player/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/SalehTZ/telegram_music_player/ci.yml?branch=main&label=CI&logo=githubactions&logoColor=white"></a>
+</p>
 
-| Home | Songs | Drawer | Player |
-| :---: | :---: | :---: | :---: |
-| ![Home](docs/screenshots/home.png) | ![Songs](docs/screenshots/songs.png) | ![Drawer](docs/screenshots/drawer.png) | ![Player](docs/screenshots/player.png) |
+<p align="center">
+  <img src="docs/screenshots/home.png" width="200" alt="Home">
+  <img src="docs/screenshots/songs.png" width="200" alt="Songs">
+  <img src="docs/screenshots/drawer.png" width="200" alt="Drawer">
+  <img src="docs/screenshots/player.png" width="200" alt="Player">
+</p>
 
-## Features
+> **Status:** early development. The app's screens are in place and run on demo
+> data; reading your music library and real playback come next.
+
+---
+
+## Why Telegram Music Player?
+
+Telegram is where a lot of us find music: channels, groups, friends sending
+songs. But those files end up scattered, with titles like `@SomeChannel - track 03`
+and no cover art. This app gathers them in one place and cleans them up.
 
 Done:
 
-- Home page with recently played songs, artists and favorites
-- Songs list with format and duration
-- Navigation drawer
-- Now playing screen with controls, a seek bar and a lyrics preview
-- Mini player floating over the home and songs pages
+- **Home** with recently played songs, artists and favorites
+- **Songs** list with format and duration
+- **Now playing** screen with controls, a seek bar and a lyrics preview
+- **Mini player** floating over your library
 
-Planned:
+Coming next:
 
 - Playback with `just_audio` and `audio_service`
-- Library from the `Music/Telegram` and `Download/Telegram` folders
-- Tag editor for title, artist, album, cover and lyrics
+- Your library from the `Music/Telegram` and `Download/Telegram` folders
+- A tag editor for title, artist, album, cover and lyrics
 - Album cover and lyrics search
+
+## Download
+
+Grab the latest build from **[Releases](https://github.com/SalehTZ/telegram_music_player/releases)**:
+
+| Platform | File |
+|---|---|
+| Android | `telegram-music-player-android-arm64-v8a.apk` (most phones), `armeabi-v7a` for older ones, `x86_64` for emulators and Chromebooks |
+
+If you installed **v0.1.0**, uninstall it before installing a newer version. It
+was a preview signed with a temporary key, so Android won't update it.
+
+<details>
+<summary>Verify that an APK is really from us</summary>
+
+Every official Android release is signed with the same key as
+[Snag](https://github.com/SalehTZ/snag). Check it with `apksigner` (from the
+Android SDK build-tools):
+
+```bash
+apksigner verify --print-certs telegram-music-player-android-*.apk
+```
+
+The `SHA-256` digest must be:
+
+```
+A5:35:0A:AA:8A:BC:94:6C:C8:68:36:B7:70:F6:61:70:D3:EF:C2:AE:7E:6C:15:B3:DD:0A:3C:E6:A6:AA:13:8D
+```
+
+If it doesn't match, don't install it. An APK signed with a different key also
+can't update an existing install. Each release also lists the files' checksums
+in `SHA256SUMS.txt`.
+</details>
+
+## Support Telegram Music Player
+
+Telegram Music Player is free and always will be: no ads, no paywalls, no "pro"
+version. If you like it, please consider chipping in. Donations pay for the
+hours that go into building it and keep it free for everyone.
+
+<a href="https://github.com/sponsors/SalehTZ"><img alt="GitHub Sponsors" src="https://img.shields.io/badge/GitHub%20Sponsors-%E2%9D%A4-ea4aaa?style=for-the-badge&logo=githubsponsors&logoColor=white"></a>
+
+**Crypto**, listed cheapest network first. Send only on the network shown; coins
+sent on a different network can be lost for good.
+
+| Network | On exchanges, pick | Send | Address |
+|---|---|---|---|
+| **BNB Smart Chain** (lowest fees) | `BSC` / `BEP20` | BNB, USDT | `0xDc131f09a194957EAdD1c069765BF9e78013Ac8C` |
+| **Tron** | `TRON` / `TRC20` | TRX, USDT | `TPmJbZpicJEaG9Vj5sMLBmKvzMnyn7Bkxt` |
+| **Ethereum** | `ETH` / `ERC20` | ETH, USDT | `0xDc131f09a194957EAdD1c069765BF9e78013Ac8C` |
+| **Bitcoin** | `BTC` (SegWit, address starts with `bc1`) | BTC | `bc1qahd3arfp90rpny73dp9unjhcdl32mmnkrln7uy` |
+
+<details>
+<summary>Which network should I use?</summary>
+
+- **BNB Smart Chain (BSC, BEP20)**: Binance's network. The cheapest here, usually a few cents. Not the same as "BNB Beacon Chain" or "opBNB".
+- **Tron (TRC20)**: the most widely supported network for USDT, especially on Iranian exchanges. Sending USDT costs around $1 unless your wallet has staked TRX.
+- **Ethereum (ERC20)**: the original smart-contract network. Often cheap lately, but fees can jump when it's busy.
+- **Bitcoin**: the original. Fees vary with network load, and it's slower than the others.
+
+The BNB Smart Chain and Ethereum addresses are the same. That's normal: both networks use the same address format. Just make sure the network you pick matches the row you're copying from.
+</details>
+
+You can also help for free:
+- ⭐ **Star the repo.** It helps other people find the app.
+- 🐛 **[Report bugs](https://github.com/SalehTZ/telegram_music_player/issues)** and suggest features.
+- 📥 **Try [Snag](https://github.com/SalehTZ/snag)**, my free video and audio downloader.
 
 ## Where the songs come from
 
@@ -38,7 +124,7 @@ Telegram's **Save to Music** (`Music/Telegram`) or **Save to Downloads**
 (`Download/Telegram`) are in shared storage, so the app can find them through
 Android's media library.
 
-## Getting started
+## Build it yourself
 
 You need [Flutter 3.16](https://docs.flutter.dev/release/archive) (the version
 `pubspec.lock` was made with), the Android SDK and Java 17.
@@ -49,6 +135,9 @@ cd telegram_music_player
 mkdir -p assets/audio   # listed in pubspec.yaml, but its contents are git-ignored
 flutter pub get
 flutter run
+
+# Release build, one APK per CPU type
+flutter build apk --release --split-per-abi
 ```
 
 Run the checks that CI runs:
@@ -59,7 +148,13 @@ flutter analyze
 flutter test
 ```
 
-## Project structure
+To update the screenshots after changing the UI:
+
+```sh
+flutter test test/screenshots_test.dart --dart-define=SCREENSHOT_DIR=docs/screenshots
+```
+
+### Project structure
 
 ```text
 lib/
@@ -79,72 +174,54 @@ assets/
   images/                   default album art
 ```
 
-## CI and releases
+## Releases
 
-GitHub Actions runs two workflows:
+Two GitHub Actions workflows build the app:
 
-- **CI** (`.github/workflows/ci.yml`) runs on every push and pull request. It
-  checks formatting, analyzes, runs the tests and builds a release APK. The APK
-  is attached to the run as the `telegram-music-player-apk` artifact for 14
-  days, so you can install any build from the Actions tab.
-- **Release** (`.github/workflows/release.yml`) runs when you push a version
-  tag. It builds the APK and publishes it as a GitHub release with
-  generated release notes.
+- **CI** (`.github/workflows/ci.yml`) runs on every push and pull request: it
+  checks formatting, analyzes, runs the tests and builds one APK per CPU type,
+  which you can download from the run for 14 days.
+- **Release** (`.github/workflows/release.yml`) runs when a version tag is
+  pushed. It builds one APK per CPU type, checks that each one is signed with
+  the release key above, and publishes them with `SHA256SUMS.txt` as a GitHub
+  release.
 
 To publish a release:
 
 ```sh
-git tag v0.1.0
-git push origin v0.1.0
+git tag v0.2.0
+git push origin v0.2.0
 ```
 
-The version name comes from the tag (`v0.1.0` becomes `0.1.0`) and the
-version code from the workflow run number, so each release has a higher
-version code than the last.
+The version name comes from the tag and the version code from the workflow run
+number.
 
 ### Release signing
 
-Android only installs an update if it's signed with the same key as the app
-already on the phone. Without a key, the release workflow signs with a
-temporary debug key, so each release has to be uninstalled before installing
-the next. To sign with your own key:
+Releases are signed with the same key as Snag, using the same repository
+secrets (**Settings → Secrets and variables → Actions**). Copy the values from
+Snag's secrets:
 
-1. Create a keystore once and keep it safe. If you lose it, users have to
-   uninstall the app to get updates.
+| Secret | Value |
+| --- | --- |
+| `ANDROID_KEYSTORE_BASE64` | the keystore file, base64-encoded |
+| `ANDROID_KEYSTORE_PASSWORD` | the keystore password (also used as the key password) |
+| `ANDROID_KEY_ALIAS` | the key alias |
 
-   ```sh
-   keytool -genkey -v -keystore upload-keystore.jks -keyalg RSA \
-     -keysize 2048 -validity 10000 -alias upload
-   ```
-
-2. Add these repository secrets under **Settings → Secrets and variables →
-   Actions**:
-
-   | Secret | Value |
-   | --- | --- |
-   | `ANDROID_KEYSTORE_BASE64` | output of `base64 -w 0 upload-keystore.jks` (macOS: `base64 -i upload-keystore.jks`) |
-   | `ANDROID_KEYSTORE_PASSWORD` | the keystore password |
-   | `ANDROID_KEY_ALIAS` | `upload`, or the alias you chose |
-   | `ANDROID_KEY_PASSWORD` | the key password |
+Without them, or with a different key, the release workflow fails instead of
+publishing an APK that can't update existing installs.
 
 To sign release builds on your own machine, create `android/key.properties`
 (it's git-ignored):
 
 ```properties
-storeFile=/absolute/path/to/upload-keystore.jks
+storeFile=/absolute/path/to/release.jks
 storePassword=...
-keyAlias=upload
 keyPassword=...
+keyAlias=...
 ```
 
-## Screenshots
-
-The screenshots above are rendered from the app with its demo data. To update
-them after changing the UI:
-
-```sh
-flutter test test/screenshots_test.dart --dart-define=SCREENSHOT_DIR=docs/screenshots
-```
+Without that file, release builds use the debug key, which is fine for testing.
 
 ## Credits
 
