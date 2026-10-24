@@ -21,8 +21,12 @@ void main() {
   });
   tearDown(() => dir.delete(recursive: true));
 
-  FolderMusicLibrary library() =>
-      FolderMusicLibrary([Directory('${dir.path}/Music')], cache: cache);
+  FolderMusicLibrary library({File? settings}) {
+    final library = FolderMusicLibrary([Directory('${dir.path}/Music')],
+        cache: cache, settings: settings);
+    addTearDown(library.dispose);
+    return library;
+  }
 
   test('lists the songs in its folders with their tags', () async {
     final songs = await library().songs();
@@ -86,5 +90,70 @@ void main() {
     final songs =
         await FolderMusicLibrary([Directory('${dir.path}/nowhere')]).songs();
     expect(songs, isEmpty);
+  });
+
+  test('keeps the folders the user picked', () async {
+    final settings = File('${dir.path}/folders.json');
+    final other = await Directory('${dir.path}/Other').create();
+    await File('test/fixtures/sine.ogg').copy('${other.path}/sine.ogg');
+
+    final songs = library(settings: settings);
+    expect(await songs.addFolder(other.path), isTrue);
+    // * Already inside a listed folder
+    expect(await songs.addFolder(music.path), isFalse);
+    expect((await songs.songs()).length, 4);
+
+    final again = library(settings: settings);
+    await again.removeFolder('${dir.path}/Music');
+    expect((await again.songs()).map((s) => s.fileName), ['sine.ogg']);
+    expect(library(settings: settings).folders, isNot(contains(music.path)));
+    expect((await library(settings: settings).songs()).length, 1);
+  });
+
+  test('a folder around listed ones takes their place', () async {
+    final songs = library(settings: File('${dir.path}/folders.json'));
+    await songs.songs();
+    expect(await songs.addFolder(dir.path), isTrue);
+    expect(songs.folders, [dir.path]);
+  });
+
+  test('dropped songs are copied in and folders added', () async {
+    final songs = library(settings: File('${dir.path}/folders.json'));
+    final outside = await Directory('${dir.path}/Desktop').create();
+    final mp3 = await File('test/fixtures/sine_cbr.mp3')
+        .copy('${outside.path}/dropped.mp3');
+    final text = await File('${outside.path}/notes.txt').writeAsString('x');
+    final album = await Directory('${dir.path}/Album').create();
+    await File('test/fixtures/sine.opus').copy('${album.path}/sine.opus');
+
+    final results = songs.imports.first;
+    final added = await songs.importPaths([
+      mp3.path,
+      mp3.path,
+      text.path,
+      album.path,
+      '${music.path}/sine.flac',
+    ]);
+    expect(added, 1);
+    final result = await results;
+    // * The second copy gets a name of its own; the song already in the
+    // * library is left where it is
+    expect(result.saved, ['dropped.mp3', 'dropped (2).mp3']);
+    expect(result.failed, 1);
+    expect(
+      File('${dir.path}/Music/Stash/dropped (2).mp3').existsSync(),
+      isTrue,
+    );
+    expect((await songs.songs()).length, 6);
+  });
+
+  test('songs added from outside are noticed', () async {
+    final songs = library();
+    await songs.songs();
+    final changed = songs.changes.first;
+    // * Into a folder that was there before the scan, as Linux watches each
+    await File('test/fixtures/sine.ogg').copy('${music.path}/new.ogg');
+    await changed.timeout(const Duration(seconds: 5));
+    expect((await songs.songs()).length, 4);
   });
 }

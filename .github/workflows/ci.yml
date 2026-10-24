@@ -129,3 +129,29 @@ jobs:
           name: stash-windows-x64
           path: build/windows/x64/runner/Release
           retention-days: 14
+
+  build-macos:
+    name: Build macOS
+    needs: check
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build
+        run: flutter build macos --release
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: stash-macos
+          path: build/macos/Build/Products/Release/Stash.app
+          retention-days: 14

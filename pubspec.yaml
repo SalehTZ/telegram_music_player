@@ -18,6 +18,10 @@ dependencies:
   just_audio_media_kit: ^2.1.0
   media_kit_libs_linux: ^1.2.1
   media_kit_libs_windows_audio: ^1.0.9
+  file_selector: ^1.1.0
+  desktop_drop: ^0.8.4
+  audio_service_mpris: ^0.2.1
+  audio_service_win: ^0.0.3
 
 dev_dependencies:
   flutter_test:

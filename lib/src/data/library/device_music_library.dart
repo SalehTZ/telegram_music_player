@@ -37,6 +37,10 @@ class DeviceMusicLibrary implements MusicLibrary {
   @override
   Stream<({List<String> saved, int failed})> get imports => _imports.stream;
 
+  /// New songs are picked up when Stash comes back to the front instead.
+  @override
+  Stream<void> get changes => const Stream.empty();
+
   @override
   Future<bool> hasPermission() async =>
       await _channel.invokeMethod<bool>('hasPermission') ?? false;

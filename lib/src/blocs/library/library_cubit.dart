@@ -20,6 +20,7 @@ class LibraryCubit extends Cubit<LibraryState> {
   final ArtworkCache artwork;
   final _notices = StreamController<String>.broadcast();
   StreamSubscription? _imports;
+  StreamSubscription? _changes;
 
   LibraryCubit({required this.library, required this.store})
       : artwork = ArtworkCache(library),
@@ -38,6 +39,7 @@ class LibraryCubit extends Cubit<LibraryState> {
       emit(_restore(saved, (key) => key as String));
     }
     _imports = library.imports.listen(_onImported);
+    _changes = library.changes.listen((_) => refresh());
     await refresh();
   }
 
@@ -238,6 +240,34 @@ class LibraryCubit extends Cubit<LibraryState> {
     return null;
   }
 
+  /// The folders Stash looks in, when the user picks them: on a computer.
+  PickedFolders? get pickedFolders => switch (library) {
+        final PickedFolders picked => picked,
+        _ => null,
+      };
+
+  Future<void> addFolder(String path) async {
+    if (await pickedFolders?.addFolder(path) == false) {
+      _notices.add('Stash already looks in that folder');
+    }
+    await refresh();
+  }
+
+  Future<void> removeFolder(String path) async {
+    await pickedFolders?.removeFolder(path);
+    await refresh();
+  }
+
+  /// Files and folders dropped on Stash: songs are copied in, folders are
+  /// added.
+  Future<void> importPaths(List<String> paths) async {
+    final added = await pickedFolders?.importPaths(paths) ?? 0;
+    if (added > 0) {
+      _notices.add(added == 1 ? 'Added the folder' : 'Added $added folders');
+      await refresh();
+    }
+  }
+
   void _onImported(({List<String> saved, int failed}) result) {
     refresh();
     final saved = result.saved;
@@ -252,6 +282,7 @@ class LibraryCubit extends Cubit<LibraryState> {
   @override
   Future<void> close() {
     _imports?.cancel();
+    _changes?.cancel();
     _notices.close();
     return super.close();
   }

@@ -86,6 +86,14 @@ Grab the latest build from **[Releases](https://github.com/SalehTZ/Stash/release
 | Platform | File |
 |---|---|
 | Android | `stash-android-arm64-v8a.apk` (most phones), `armeabi-v7a` for older ones, `x86_64` for emulators and Chromebooks |
+| Linux | `stash-linux-x64.tar.gz`: unpack it anywhere and run `stash`. It plays through libmpv, so install that first (`sudo apt install libmpv2` on Debian and Ubuntu, `libmpv` on Fedora and Arch) |
+| Windows | `stash-windows-x64.zip`: unpack it anywhere and run `stash.exe` |
+| macOS | `stash-macos.zip`: unpack it and move Stash to Applications. It isn't notarized yet, so open it the first time with right-click → Open |
+
+On a computer Stash plays the songs in your Music folder and in Telegram
+Desktop's downloads. Add other folders on the Folders page, or drop songs and
+folders on the window. Media keys and the system's now-playing controls work
+on all three.
 
 On Android, **[add Stash to Obtainium](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22ir.salehtz.stash%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FSalehTZ%2FStash%22%2C%22author%22%3A%22SalehTZ%22%2C%22name%22%3A%22Stash%22%7D)** to get updates straight from these releases.
 
@@ -175,6 +183,12 @@ flutter run
 
 # Release build, one APK per CPU type
 flutter build apk --release --split-per-abi
+
+# Desktop builds, each on its own system. Linux needs libgtk-3-dev and
+# libmpv-dev.
+flutter build linux --release
+flutter build windows --release
+flutter build macos --release
 ```
 
 Run the checks that CI runs:
@@ -225,12 +239,14 @@ test/
 Two GitHub Actions workflows build the app:
 
 - **CI** (`.github/workflows/ci.yml`) runs on every push and pull request: it
-  checks formatting, analyzes, runs the tests and builds one APK per CPU type,
-  which you can download from the run for 14 days.
+  checks formatting, analyzes, runs the tests and builds one APK per CPU type
+  and the Linux, Windows and macOS apps, which you can download from the run
+  for 14 days.
 - **Release** (`.github/workflows/release.yml`) runs when a version tag is
   pushed. It builds one APK per CPU type, checks that each one is signed with
   the release key above, and publishes them with `SHA256SUMS.txt` as a GitHub
-  release.
+  release. Then it builds the Linux, Windows and macOS apps and adds them to
+  the release, each with its own checksum file.
 
 To publish a release:
 

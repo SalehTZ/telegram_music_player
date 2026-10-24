@@ -10,8 +10,10 @@ import '../../../data/models/song_model.dart';
 import '../../../utils/song_text.dart';
 import '../../navigation.dart';
 import '../../widgets/common/artwork/artwork_image.dart';
+import '../../widgets/music_folders/music_folders.dart';
 
-/// The folders that hold songs, the ones Telegram saves to first.
+/// The folders that hold songs, the ones Telegram saves to first. On a
+/// computer, the folders Stash looks in come above them.
 class FoldersScreen extends StatelessWidget {
   final double bottomPadding;
   const FoldersScreen({super.key, this.bottomPadding = AppPadding.p20});
@@ -21,6 +23,7 @@ class FoldersScreen extends StatelessWidget {
     return BlocBuilder<LibraryCubit, LibraryState>(
       builder: (context, state) {
         final folders = state.folders;
+        final picksFolders = context.read<LibraryCubit>().pickedFolders != null;
         return ListView.separated(
           padding: EdgeInsets.fromLTRB(
               AppPadding.p20, AppPadding.p20, AppPadding.p20, bottomPadding),
@@ -28,14 +31,22 @@ class FoldersScreen extends StatelessWidget {
           separatorBuilder: (_, __) => AppGap.h8,
           itemBuilder: (context, index) {
             if (index == 0) {
+              final count = Text(
+                folders.length == 1 ? '1 folder' : '${folders.length} folders',
+                style: TextStyles.getSemiBoldStyle(fontSize: FontSize.s20),
+              );
               return Padding(
                 padding: const EdgeInsets.only(bottom: AppPadding.p12),
-                child: Text(
-                  folders.length == 1
-                      ? '1 folder'
-                      : '${folders.length} folders',
-                  style: TextStyles.getSemiBoldStyle(fontSize: FontSize.s20),
-                ),
+                child: picksFolders
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const MusicFolders(),
+                          AppGap.h40,
+                          count,
+                        ],
+                      )
+                    : count,
               );
             }
             final folder = folders[index - 1];
