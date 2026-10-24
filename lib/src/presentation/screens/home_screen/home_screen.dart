@@ -5,7 +5,7 @@ import '../../../constants/styles_manager.dart';
 import '../../../constants/values_manager.dart';
 import '../../../data/fake_artist_data.dart';
 import '../../../data/fake_music_data.dart';
-import '../../widgets/appbar/appbar_widget.dart';
+import '../../../data/models/song_model.dart';
 import '../../widgets/artist_thumbnail/artist_thumbnail_widget.dart';
 import '../../widgets/common/custom_list_builder/custom_list_builder.dart';
 import '../../widgets/common/section_widget/section.dart';
@@ -14,15 +14,24 @@ import '../../widgets/search_bar/search_bar_widget.dart';
 import '../../widgets/song_thumbnail/song_thumbnail_widget.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  /// Space kept free under the content, e.g. for the mini player.
+  final double bottomPadding;
+  final ValueChanged<Song>? onSongTap;
+  const HomeScreen({
+    super.key,
+    this.bottomPadding = AppPadding.p20,
+    this.onSongTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     var fakeSongsWidget = List.generate(
       fakeSongsList.length,
       (index) {
+        final song = fakeSongsList[index];
         return SongThumbnailWidget(
-          song: fakeSongsList[index],
+          song: song,
+          onTap: () => onSongTap?.call(song),
         );
       },
     );
@@ -34,52 +43,67 @@ class HomeScreen extends StatelessWidget {
         );
       },
     );
-    return SafeArea(
-      child: Scaffold(
-        appBar: const AppBarWidget(),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppPadding.p20),
-          child: ListView(
-            children: [
-              AppGap.h20,
-              // * SearchBar
-              const SearchBarWidget(),
+    const listPadding = EdgeInsets.symmetric(horizontal: AppPadding.p20);
+    final songsListHeight = SongThumbnailWidget.height(context);
+    return ListView(
+      padding: EdgeInsets.only(top: AppPadding.p20, bottom: bottomPadding),
+      children: [
+        // * SearchBar
+        const Padding(
+          padding: listPadding,
+          child: SearchBarWidget(),
+        ),
 
-              AppGap.h28,
-              // * Recently Played section
-              SectionWidget(
-                header: SectionHeader(
-                  child: Text(
-                    "Recently Played",
-                    style: TextStyles.getSemiBoldStyle(fontSize: FontSize.s20),
-                  ),
-                ),
-                slot: CustomListBuilder(
-                  widgetList: fakeSongsWidget,
-                  listPadding: EdgeInsets.zero,
-                  crossAxisSize: AppSize.s210,
-                ),
-              ),
-
-              AppGap.h28,
-              // * Artists section
-              SectionWidget(
-                header: SectionHeader(
-                  child: Text(
-                    "Artists",
-                    style: TextStyles.getSemiBoldStyle(fontSize: FontSize.s20),
-                  ),
-                ),
-                slot: CustomListBuilder(
-                  widgetList: fakeArtistWidget,
-                  listPadding: EdgeInsets.zero,
-                  crossAxisSize: AppSize.s136,
-                ),
-              ),
-            ],
+        AppGap.h28,
+        // * Recently Played section
+        SectionWidget(
+          header: SectionHeader(
+            child: Text(
+              "Recently Played",
+              style: TextStyles.getSemiBoldStyle(fontSize: FontSize.s20),
+            ),
+          ),
+          slot: CustomListBuilder(
+            widgetList: fakeSongsWidget,
+            listPadding: listPadding,
+            gutter: AppSize.s12,
+            crossAxisSize: songsListHeight,
           ),
         ),
-      ),
+
+        AppGap.h28,
+        // * Artists section
+        SectionWidget(
+          header: SectionHeader(
+            child: Text(
+              "Artists",
+              style: TextStyles.getSemiBoldStyle(fontSize: FontSize.s20),
+            ),
+          ),
+          slot: CustomListBuilder(
+            widgetList: fakeArtistWidget,
+            listPadding: listPadding,
+            crossAxisSize: ArtistThumbnailWidget.height(context),
+          ),
+        ),
+
+        AppGap.h28,
+        // * Favorites section
+        SectionWidget(
+          header: SectionHeader(
+            child: Text(
+              "Favorites",
+              style: TextStyles.getSemiBoldStyle(fontSize: FontSize.s20),
+            ),
+          ),
+          slot: CustomListBuilder(
+            widgetList: fakeSongsWidget,
+            listPadding: listPadding,
+            gutter: AppSize.s12,
+            crossAxisSize: songsListHeight,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -10,6 +10,7 @@ class Song {
   final int? rating; // Rating out of 5
   final String? genre;
   final int? releaseDate;
+  final String? lyrics; // Unsynced lyrics, one line per row
 
   Song({
     required this.title,
@@ -21,5 +22,13 @@ class Song {
     this.rating,
     this.genre,
     this.releaseDate,
+    this.lyrics,
   });
+
+  /// File format taken from the file extension, e.g. "MP3" or "FLAC".
+  String get format {
+    final dotIndex = filePath.lastIndexOf('.');
+    if (dotIndex == -1 || dotIndex == filePath.length - 1) return '';
+    return filePath.substring(dotIndex + 1).toUpperCase();
+  }
 }

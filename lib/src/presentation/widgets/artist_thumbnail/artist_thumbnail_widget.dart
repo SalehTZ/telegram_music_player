@@ -13,24 +13,38 @@ class ArtistThumbnailWidget extends StatelessWidget {
     required this.artist,
   });
 
+  /// Height of the thumbnail, used to size horizontal lists of artists.
+  static double height(BuildContext context) {
+    final textScaler = MediaQuery.textScalerOf(context);
+    return (AppPadding.p12 * 2 +
+            AppSize.s84 +
+            AppSize.s8 +
+            textScaler.scale(FontSize.s14) * FontHeight.h1_3)
+        .ceilToDouble();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: AppSize.s84,
-      child: Column(
-        children: [
-          // * Artist image
-          ArtistImagePlaceholder(imageData: artist.image),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppPadding.p12),
+        child: Column(
+          children: [
+            // * Artist image
+            ArtistImagePlaceholder(imageData: artist.image),
 
-          AppGap.h8,
-          // * Artist name
-          Text(
-            artist.name,
-            maxLines: 2,
-            textAlign: TextAlign.center,
-            style: TextStyles.getSemiBoldStyle(fontSize: FontSize.s14),
-          ),
-        ],
+            AppGap.h8,
+            // * Artist name
+            Text(
+              artist.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: TextStyles.getMediumStyle(fontSize: FontSize.s14),
+            ),
+          ],
+        ),
       ),
     );
   }

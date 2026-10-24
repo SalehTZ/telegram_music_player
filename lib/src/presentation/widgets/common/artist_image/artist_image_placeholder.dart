@@ -20,11 +20,13 @@ class ArtistImagePlaceholder extends StatelessWidget {
               AssetsManager.defaultSongThumbnail,
               width: AppSize.s84,
               height: AppSize.s84,
+              fit: BoxFit.cover,
             )
           : Image.memory(
               imageData!,
               width: AppSize.s84,
               height: AppSize.s84,
+              fit: BoxFit.cover,
             ),
     );
   }

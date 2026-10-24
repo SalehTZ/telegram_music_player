@@ -11,9 +11,12 @@ class SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppPadding.p12),
+      padding: const EdgeInsets.symmetric(
+        vertical: AppPadding.p12,
+        horizontal: AppPadding.p20,
+      ),
       child: SizedBox(
-        width: AppSize.s390,
+        width: double.infinity,
         child: child,
       ),
     );
