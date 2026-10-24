@@ -100,7 +100,7 @@ class ThemesManager {
       showDragHandle: true,
       dragHandleColor: ColorManager.faintText,
     ),
-    dialogTheme: const DialogTheme(
+    dialogTheme: const DialogThemeData(
       backgroundColor: ColorManager.sheetBackground,
       surfaceTintColor: ColorManager.transparent,
     ),

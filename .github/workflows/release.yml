@@ -10,7 +10,7 @@ permissions:
 
 env:
   # Keep in sync with the Flutter version used to create pubspec.lock.
-  FLUTTER_VERSION: "3.16.9"
+  FLUTTER_VERSION: "3.47.8"
   # SHA-256 of the release certificate, shared with Snag and published in
   # README.md. Releases signed with any other key are refused.
   RELEASE_CERT_SHA256: a5350aaa8abc946cc86836b770f66170d3efc2ae7e6c15b3dd0a3ce6a6aa138d

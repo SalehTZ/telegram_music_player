@@ -79,8 +79,11 @@ Future<Uint8List> _cover(int seed) async {
           ..close(),
         paint,
       );
-      canvas.drawCircle(const Offset(size * 0.3, size * 0.3), size * 0.12,
-          Paint()..color = ground.withRed(min(255, ground.red + 40)));
+      canvas.drawCircle(
+          const Offset(size * 0.3, size * 0.3),
+          size * 0.12,
+          Paint()
+            ..color = ground.withRed(min(255, (ground.r * 255).round() + 40)));
   }
   final image = await recorder.endRecording().toImage(400, 400);
   final bytes = await image.toByteData(format: ui.ImageByteFormat.png);

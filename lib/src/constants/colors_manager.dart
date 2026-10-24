@@ -49,10 +49,9 @@ extension HexColor on Color {
   /// Convert any Hex color to Material Color.
   /// Input: color without alpha example #FF94C7
   static MaterialColor toMaterialColor(int hexColorString) {
-    final color = Color(hexColorString);
-    final int red = color.red;
-    final int green = color.green;
-    final int blue = color.blue;
+    final int red = (hexColorString >> 16) & 0xFF;
+    final int green = (hexColorString >> 8) & 0xFF;
+    final int blue = hexColorString & 0xFF;
 
     final Map<int, Color> shades = {
       50: Color.fromRGBO(red, green, blue, .1),
@@ -67,6 +66,6 @@ extension HexColor on Color {
       900: Color.fromRGBO(red, green, blue, 1),
     };
 
-    return MaterialColor(color.value, shades);
+    return MaterialColor(hexColorString, shades);
   }
 }

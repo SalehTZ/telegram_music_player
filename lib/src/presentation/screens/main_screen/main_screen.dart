@@ -70,7 +70,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
     return PopScope(
       canPop: _page == DrawerPage.home,
-      onPopInvoked: (didPop) {
+      onPopInvokedWithResult: (didPop, _) {
         if (didPop) return;
         final scaffold = _scaffoldKey.currentState;
         if (scaffold != null && scaffold.isDrawerOpen) {
