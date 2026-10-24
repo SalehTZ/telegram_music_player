@@ -7,6 +7,7 @@ import '../../../constants/fonts_manager.dart';
 import '../../../constants/styles_manager.dart';
 import '../../../constants/values_manager.dart';
 import '../../../data/models/song_model.dart';
+import '../../motion.dart';
 import '../common/artwork/artwork_image.dart';
 
 class SongThumbnailWidget extends StatelessWidget {
@@ -30,47 +31,49 @@ class SongThumbnailWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: SizedBox(
-        width: AppSize.s162,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // * album art image
-            Stack(
-              children: [
-                ArtworkImage(
-                  song: song,
-                  size: AppSize.s162,
-                  borderRadius: const BorderRadius.all(AppRadius.rad12),
-                ),
-                const Positioned(
-                  left: AppPadding.p8,
-                  bottom: AppPadding.p8,
-                  child: _PlayBadge(),
-                ),
-              ],
-            ),
+    return Pressable(
+      child: GestureDetector(
+        onTap: onTap,
+        child: SizedBox(
+          width: AppSize.s162,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // * album art image
+              Stack(
+                children: [
+                  ArtworkImage(
+                    song: song,
+                    size: AppSize.s162,
+                    borderRadius: const BorderRadius.all(AppRadius.rad12),
+                  ),
+                  const Positioned(
+                    left: AppPadding.p8,
+                    bottom: AppPadding.p8,
+                    child: _PlayBadge(),
+                  ),
+                ],
+              ),
 
-            AppGap.h8,
-            // * Song name
-            Text(
-              song.title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyles.getSemiBoldStyle(fontSize: FontSize.s16),
-            ),
+              AppGap.h8,
+              // * Song name
+              Text(
+                song.title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyles.getSemiBoldStyle(fontSize: FontSize.s16),
+              ),
 
-            AppGap.h8,
-            // * Artist name
-            Text(
-              song.artistOrUnknown,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyles.getLightStyle(fontSize: FontSize.s14),
-            ),
-          ],
+              AppGap.h8,
+              // * Artist name
+              Text(
+                song.artistOrUnknown,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyles.getLightStyle(fontSize: FontSize.s14),
+              ),
+            ],
+          ),
         ),
       ),
     );

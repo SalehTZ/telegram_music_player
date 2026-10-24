@@ -14,6 +14,7 @@ import '../../../data/library/artwork_cache.dart';
 import '../../../data/lyrics/lyrics.dart';
 import '../../../data/models/song_model.dart';
 import '../../../utils/duration_extension.dart';
+import '../../motion.dart';
 import '../../navigation.dart';
 import '../../widgets/appbar/appbar_widget.dart';
 import '../../widgets/common/artwork/artwork_image.dart';
@@ -92,11 +93,7 @@ class _NowPlayingState extends State<NowPlaying> {
               Flexible(
                 child: AspectRatio(
                   aspectRatio: 1,
-                  child: ArtworkImage(
-                    song: song,
-                    quality: ArtworkSize.large,
-                    borderRadius: const BorderRadius.all(AppRadius.rad12),
-                  ),
+                  child: _Cover(song: song, playing: state.playing),
                 ),
               ),
 
@@ -107,26 +104,32 @@ class _NowPlayingState extends State<NowPlaying> {
                 children: [
                   const SizedBox(width: AppSize.s48),
                   Expanded(
-                    child: Text(
-                      song.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: TextStyles.getBoldStyle(fontSize: FontSize.s24),
+                    child: MotionSwitcher(
+                      child: Text(
+                        key: ValueKey(song.id),
+                        song.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: TextStyles.getBoldStyle(fontSize: FontSize.s24),
+                      ),
                     ),
                   ),
                   _FavoriteButton(song: song),
                 ],
               ),
               AppGap.h12,
-              Text(
-                song.artistOrUnknown,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: TextStyles.getRegularStyle(
-                  fontSize: FontSize.s18,
-                  color: ColorManager.secondaryText,
+              MotionSwitcher(
+                child: Text(
+                  key: ValueKey(song.id),
+                  song.artistOrUnknown,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: TextStyles.getRegularStyle(
+                    fontSize: FontSize.s18,
+                    color: ColorManager.secondaryText,
+                  ),
                 ),
               ),
 
@@ -162,6 +165,43 @@ class _NowPlayingState extends State<NowPlaying> {
   }
 }
 
+/// The cover, flown in from the mini player. It sits back a little while
+/// the song is paused and comes forward when it plays.
+class _Cover extends StatelessWidget {
+  final Song song;
+  final bool playing;
+  const _Cover({required this.song, required this.playing});
+
+  static const _radius = BorderRadius.all(AppRadius.rad12);
+
+  @override
+  Widget build(BuildContext context) {
+    return Hero(
+      tag: Motion.coverHeroTag,
+      // * In flight the small cover the mini player already has, so the
+      // * picture doesn't blink while the large one loads
+      flightShuttleBuilder: (_, animation, __, ___, ____) =>
+          ArtworkImage(song: song, borderRadius: _radius),
+      child: AnimatedScale(
+        scale: playing || Motion.reduced(context) ? 1 : 0.86,
+        duration: Motion.reveal,
+        curve: Motion.easeOut,
+        child: MotionSwitcher(
+          rise: 0,
+          scale: 0.94,
+          duration: Motion.reveal,
+          child: ArtworkImage(
+            key: ValueKey(song.id),
+            song: song,
+            quality: ArtworkSize.large,
+            borderRadius: _radius,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _FavoriteButton extends StatelessWidget {
   final Song song;
   const _FavoriteButton({required this.song});
@@ -175,11 +215,16 @@ class _FavoriteButton extends StatelessWidget {
         return IconButton(
           onPressed: () => context.read<LibraryCubit>().toggleFavorite(song),
           tooltip: favorite ? 'Remove from favorites' : 'Add to favorites',
-          icon: Icon(
-            favorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-            color: favorite
-                ? ColorManager.likeButtonColor
-                : ColorManager.secondaryText,
+          icon: MotionSwitcher(
+            rise: 0,
+            scale: 0.5,
+            child: Icon(
+              key: ValueKey(favorite),
+              favorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+              color: favorite
+                  ? ColorManager.likeButtonColor
+                  : ColorManager.secondaryText,
+            ),
           ),
         );
       },
@@ -325,21 +370,39 @@ class _ControlButton extends StatelessWidget {
     return Semantics(
       button: true,
       label: label,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: onTap,
-        child: SvgPicture.asset(
-          icon,
-          width: size,
-          height: size,
-          colorFilter: active == null
-              ? null
-              : ColorFilter.mode(
-                  active
-                      ? ColorManager.primaryPressedColor
-                      : ColorManager.secondaryText,
-                  BlendMode.srcIn,
-                ),
+      child: Pressable(
+        scale: 0.85,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onTap,
+          child: MotionSwitcher(
+            rise: 0,
+            scale: 0.6,
+            duration: Motion.hover,
+            child: active == null
+                ? SvgPicture.asset(
+                    key: ValueKey(icon),
+                    icon,
+                    width: size,
+                    height: size,
+                  )
+                // * A switch eases between its off and on colours
+                : TweenAnimationBuilder<Color?>(
+                    key: ValueKey(icon),
+                    tween: ColorTween(
+                      end: active
+                          ? ColorManager.primaryPressedColor
+                          : ColorManager.secondaryText,
+                    ),
+                    duration: Motion.hover,
+                    builder: (context, color, _) => SvgPicture.asset(
+                      icon,
+                      width: size,
+                      height: size,
+                      colorFilter: ColorFilter.mode(color!, BlendMode.srcIn),
+                    ),
+                  ),
+          ),
         ),
       ),
     );
@@ -359,24 +422,35 @@ class _LyricsPreview extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // * The line being sung, then the next, faded
-          for (final (i, line) in lines.indexed) ...[
-            if (i > 0) AppGap.h8,
-            Text(
-              line,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: i == 0
-                  ? TextStyles.getSemiBoldStyle(
-                      fontSize: FontSize.s18,
-                      color: ColorManager.secondaryText,
-                    )
-                  : TextStyles.getRegularStyle(
-                      fontSize: FontSize.s16,
-                      color: ColorManager.inactiveLyricsText,
-                    ),
+          // * The line being sung, then the next, faded. When the song
+          // * moves on, the lines roll up.
+          MotionSwitcher(
+            rise: AppSize.s16,
+            duration: Motion.reveal,
+            child: Column(
+              key: ValueKey(lines.join('\n')),
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (final (i, line) in lines.indexed) ...[
+                  if (i > 0) AppGap.h8,
+                  Text(
+                    line,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: i == 0
+                        ? TextStyles.getSemiBoldStyle(
+                            fontSize: FontSize.s18,
+                            color: ColorManager.secondaryText,
+                          )
+                        : TextStyles.getRegularStyle(
+                            fontSize: FontSize.s16,
+                            color: ColorManager.inactiveLyricsText,
+                          ),
+                  ),
+                ],
+              ],
             ),
-          ],
+          ),
           AppGap.h8,
           SvgPicture.asset(
             AssetsManager.chevronUpIcon,

@@ -4,6 +4,7 @@ import '../../../constants/fonts_manager.dart';
 import '../../../constants/styles_manager.dart';
 import '../../../constants/values_manager.dart';
 import '../../../blocs/library/library_cubit.dart';
+import '../../motion.dart';
 import '../common/artwork/artwork_image.dart';
 
 class ArtistThumbnailWidget extends StatelessWidget {
@@ -27,32 +28,34 @@ class ArtistThumbnailWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: SizedBox(
-        width: AppSize.s84,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: AppPadding.p12),
-          child: Column(
-            children: [
-              // * The cover of one of their songs
-              ArtworkImage(
-                song: artist.songs.first,
-                size: AppSize.s84,
-                borderRadius: const BorderRadius.all(AppRadius.rad999),
-              ),
+    return Pressable(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: SizedBox(
+          width: AppSize.s84,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: AppPadding.p12),
+            child: Column(
+              children: [
+                // * The cover of one of their songs
+                ArtworkImage(
+                  song: artist.songs.first,
+                  size: AppSize.s84,
+                  borderRadius: const BorderRadius.all(AppRadius.rad999),
+                ),
 
-              AppGap.h8,
-              // * Artist name
-              Text(
-                artist.name,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: TextStyles.getMediumStyle(fontSize: FontSize.s14),
-              ),
-            ],
+                AppGap.h8,
+                // * Artist name
+                Text(
+                  artist.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: TextStyles.getMediumStyle(fontSize: FontSize.s14),
+                ),
+              ],
+            ),
           ),
         ),
       ),

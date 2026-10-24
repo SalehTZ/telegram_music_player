@@ -8,6 +8,7 @@ import '../../../constants/styles_manager.dart';
 import '../../../constants/values_manager.dart';
 import '../../../data/models/song_model.dart';
 import '../../layout.dart';
+import '../../motion.dart';
 import '../../navigation.dart';
 import '../../widgets/artist_thumbnail/artist_thumbnail_widget.dart';
 import '../../widgets/common/custom_list_builder/custom_list_builder.dart';
@@ -36,98 +37,102 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     const listPadding = EdgeInsets.symmetric(horizontal: AppPadding.p20);
-    return BlocBuilder<LibraryCubit, LibraryState>(
-      builder: (context, state) {
-        if (state.songs.isEmpty) return const EmptyLibrary();
-        final query = _query.trim().toLowerCase();
-        return ListView(
-          padding: EdgeInsets.only(
-            top: AppPadding.p20,
-            bottom: widget.bottomPadding,
-          ),
-          children: [
-            Padding(
-              padding: listPadding,
-              child: SearchBarWidget(
-                hintText: 'Search ${state.songs.length} songs',
-                onChanged: (value) => setState(() => _query = value),
-              ),
+    return ArrivalScope(
+      child: BlocBuilder<LibraryCubit, LibraryState>(
+        builder: (context, state) {
+          if (state.songs.isEmpty) return const EmptyLibrary();
+          final query = _query.trim().toLowerCase();
+          return ListView(
+            padding: EdgeInsets.only(
+              top: AppPadding.p20,
+              bottom: widget.bottomPadding,
             ),
-            if (query.isNotEmpty)
-              ..._results(context, state.songs, query)
-            else ...[
-              if (state.fixes.isNotEmpty &&
-                  state.duplicates.isNotEmpty &&
-                  Layout.isWide(context)) ...[
-                // * Room for both cards in one row
-                AppGap.h28,
-                Padding(
-                  padding: listPadding,
-                  child: IntrinsicHeight(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(
-                          child: TidyCard(state: state, sideBySide: true),
-                        ),
-                        AppGap.w20,
-                        Expanded(
-                          child: DuplicatesCard(state: state, sideBySide: true),
-                        ),
-                      ],
-                    ),
-                  ),
+            children: Arrive.all([
+              Padding(
+                padding: listPadding,
+                child: SearchBarWidget(
+                  hintText: 'Search ${state.songs.length} songs',
+                  onChanged: (value) => setState(() => _query = value),
                 ),
-              ] else ...[
-                if (state.fixes.isNotEmpty) ...[
-                  AppGap.h28,
-                  TidyCard(state: state),
-                ],
-                if (state.duplicates.isNotEmpty) ...[
-                  AppGap.h28,
-                  DuplicatesCard(state: state),
-                ],
-              ],
-              if (state.recentlyPlayed.isNotEmpty) ...[
-                AppGap.h28,
-                _SongRow(title: 'Recently played', songs: state.recentlyPlayed),
-              ],
-              AppGap.h28,
-              _SongRow(
-                title: 'Recently added',
-                songs: state.songs.take(20).toList(),
               ),
-              if (state.artists.isNotEmpty) ...[
-                AppGap.h28,
-                SectionWidget(
-                  header: SectionHeader(
-                    child: Text(
-                      'Artists',
-                      style:
-                          TextStyles.getSemiBoldStyle(fontSize: FontSize.s20),
+              if (query.isNotEmpty)
+                ..._results(context, state.songs, query)
+              else ...[
+                if (state.fixes.isNotEmpty &&
+                    state.duplicates.isNotEmpty &&
+                    Layout.isWide(context)) ...[
+                  // * Room for both cards in one row
+                  AppGap.h28,
+                  Padding(
+                    padding: listPadding,
+                    child: IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: TidyCard(state: state, sideBySide: true),
+                          ),
+                          AppGap.w20,
+                          Expanded(
+                            child:
+                                DuplicatesCard(state: state, sideBySide: true),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  slot: CustomListBuilder(
-                    widgetList: [
-                      for (final artist in state.artists.take(20))
-                        ArtistThumbnailWidget(
-                          artist: artist,
-                          onTap: () => _openArtist(context, artist.name),
-                        ),
-                    ],
-                    listPadding: listPadding,
-                    crossAxisSize: ArtistThumbnailWidget.height(context),
-                  ),
-                ),
-              ],
-              if (state.favoriteSongs.isNotEmpty) ...[
+                ] else ...[
+                  if (state.fixes.isNotEmpty) ...[
+                    AppGap.h28,
+                    TidyCard(state: state),
+                  ],
+                  if (state.duplicates.isNotEmpty) ...[
+                    AppGap.h28,
+                    DuplicatesCard(state: state),
+                  ],
+                ],
+                if (state.recentlyPlayed.isNotEmpty) ...[
+                  AppGap.h28,
+                  _SongRow(
+                      title: 'Recently played', songs: state.recentlyPlayed),
+                ],
                 AppGap.h28,
-                _SongRow(title: 'Favorites', songs: state.favoriteSongs),
+                _SongRow(
+                  title: 'Recently added',
+                  songs: state.songs.take(20).toList(),
+                ),
+                if (state.artists.isNotEmpty) ...[
+                  AppGap.h28,
+                  SectionWidget(
+                    header: SectionHeader(
+                      child: Text(
+                        'Artists',
+                        style:
+                            TextStyles.getSemiBoldStyle(fontSize: FontSize.s20),
+                      ),
+                    ),
+                    slot: CustomListBuilder(
+                      widgetList: [
+                        for (final artist in state.artists.take(20))
+                          ArtistThumbnailWidget(
+                            artist: artist,
+                            onTap: () => _openArtist(context, artist.name),
+                          ),
+                      ],
+                      listPadding: listPadding,
+                      crossAxisSize: ArtistThumbnailWidget.height(context),
+                    ),
+                  ),
+                ],
+                if (state.favoriteSongs.isNotEmpty) ...[
+                  AppGap.h28,
+                  _SongRow(title: 'Favorites', songs: state.favoriteSongs),
+                ],
               ],
-            ],
-          ],
-        );
-      },
+            ]),
+          );
+        },
+      ),
     );
   }
 

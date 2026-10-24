@@ -6,6 +6,7 @@ import '../../../blocs/player/player_cubit.dart';
 import '../../../constants/colors_manager.dart';
 import '../../../constants/values_manager.dart';
 import '../../../data/models/song_model.dart';
+import '../../motion.dart';
 import '../song_list_item/song_list_item_widget.dart';
 import '../song_options/song_options_sheet.dart';
 
@@ -31,34 +32,40 @@ class SongListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final offset = header == null ? 0 : 1;
-    return BlocBuilder<PlayerCubit, PlayerState>(
-      buildWhen: (a, b) => a.song?.id != b.song?.id,
-      builder: (context, player) => ListView.separated(
-        padding: EdgeInsets.fromLTRB(
-          AppPadding.p28,
-          AppPadding.p20,
-          AppPadding.p28,
-          bottomPadding,
-        ),
-        itemCount: songs.length + offset,
-        itemBuilder: (context, index) {
-          if (index < offset) return header!;
-          final song = songs[index - offset];
-          return SongListItemWidget(
-            song: song,
-            isCurrent: player.song?.id == song.id,
-            onTap: () =>
-                context.read<PlayerCubit>().play(songs, index - offset),
-            onMenuTap: () => showSongOptions(context, song, playlist: playlist),
-          );
-        },
-        separatorBuilder: (context, index) => index < offset
-            ? AppGap.h24
-            : const Divider(
-                height: AppSize.s24,
-                thickness: AppSize.s0_3,
-                color: ColorManager.listSeparator,
+    return ArrivalScope(
+      child: BlocBuilder<PlayerCubit, PlayerState>(
+        buildWhen: (a, b) => a.song?.id != b.song?.id,
+        builder: (context, player) => ListView.separated(
+          padding: EdgeInsets.fromLTRB(
+            AppPadding.p28,
+            AppPadding.p20,
+            AppPadding.p28,
+            bottomPadding,
+          ),
+          itemCount: songs.length + offset,
+          itemBuilder: (context, index) {
+            if (index < offset) return Arrive(index: 0, child: header!);
+            final song = songs[index - offset];
+            return Arrive(
+              index: index,
+              child: SongListItemWidget(
+                song: song,
+                isCurrent: player.song?.id == song.id,
+                onTap: () =>
+                    context.read<PlayerCubit>().play(songs, index - offset),
+                onMenuTap: () =>
+                    showSongOptions(context, song, playlist: playlist),
               ),
+            );
+          },
+          separatorBuilder: (context, index) => index < offset
+              ? AppGap.h24
+              : const Divider(
+                  height: AppSize.s24,
+                  thickness: AppSize.s0_3,
+                  color: ColorManager.listSeparator,
+                ),
+        ),
       ),
     );
   }

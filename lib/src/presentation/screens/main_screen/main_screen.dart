@@ -8,6 +8,7 @@ import '../../../blocs/player/player_cubit.dart';
 import '../../../constants/colors_manager.dart';
 import '../../../constants/values_manager.dart';
 import '../../layout.dart';
+import '../../motion.dart';
 import '../../widgets/appbar/appbar_widget.dart';
 import '../../widgets/audio_player/now_playing_bar.dart';
 import '../../widgets/audio_player/player_panel.dart';
@@ -76,13 +77,27 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       DrawerPage.playlists => PlaylistsScreen(bottomPadding: bottom),
       DrawerPage.songs => SongsScreen(bottomPadding: bottom),
     };
+    // * A newly picked page rises in over the old one
+    final switched = MotionSwitcher(
+      rise: AppSize.s12,
+      alignment: Alignment.topCenter,
+      child: KeyedSubtree(key: ValueKey(_page), child: page),
+    );
     final library = BlocBuilder<LibraryCubit, LibraryState>(
       buildWhen: (a, b) => a.status != b.status,
-      builder: (context, state) => state.status != LibraryStatus.ready
-          ? LibraryGate(status: state.status)
-          : panel
-              ? page
-              : WithNowPlaying(child: page),
+      builder: (context, state) => MotionSwitcher(
+        duration: Motion.reveal,
+        alignment: Alignment.topCenter,
+        child: state.status != LibraryStatus.ready
+            ? KeyedSubtree(
+                key: ValueKey(state.status),
+                child: LibraryGate(status: state.status),
+              )
+            : KeyedSubtree(
+                key: const ValueKey(LibraryStatus.ready),
+                child: panel ? switched : WithNowPlaying(child: switched),
+              ),
+      ),
     );
 
     return PopScope(

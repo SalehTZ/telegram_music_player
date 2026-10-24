@@ -8,6 +8,7 @@ import '../../../constants/colors_manager.dart';
 import '../../../constants/fonts_manager.dart';
 import '../../../constants/styles_manager.dart';
 import '../../../constants/values_manager.dart';
+import '../../motion.dart';
 import '../common/logo/stash_mark.dart';
 
 enum DrawerPage { home, folders, playlists, songs }
@@ -157,33 +158,41 @@ class _DrawerItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // * The other pages are dimmed, so the open one stands out
+    // * and the picked one brightens while the old one fades back
     final color = selected ? ColorManager.white : ColorManager.secondaryText;
     return Semantics(
       button: true,
       selected: selected,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: onTap,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SvgPicture.asset(
-              icon,
-              width: AppSize.s24,
-              height: AppSize.s24,
-              colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+      child: Pressable(
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onTap,
+          child: TweenAnimationBuilder<Color?>(
+            tween: ColorTween(end: color),
+            duration: Motion.ui,
+            curve: Motion.easeOut,
+            builder: (context, color, _) => Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SvgPicture.asset(
+                  icon,
+                  width: AppSize.s24,
+                  height: AppSize.s24,
+                  colorFilter: ColorFilter.mode(color!, BlendMode.srcIn),
+                ),
+                AppGap.w16,
+                Flexible(
+                  child: Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyles.getBoldStyle(fontSize: FontSize.s24)
+                        .copyWith(color: color),
+                  ),
+                ),
+              ],
             ),
-            AppGap.w16,
-            Flexible(
-              child: Text(
-                title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyles.getBoldStyle(fontSize: FontSize.s24)
-                    .copyWith(color: color),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
