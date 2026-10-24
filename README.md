@@ -11,14 +11,18 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/SalehTZ/telegram_music_player/releases"><img alt="Download" src="https://img.shields.io/github/v/release/SalehTZ/telegram_music_player?label=download&style=for-the-badge&color=5947B2"></a>
+  <a href="https://github.com/SalehTZ/Stash/releases"><img alt="Download" src="https://img.shields.io/github/v/release/SalehTZ/Stash?label=download&style=for-the-badge&color=5947B2"></a>
   <a href="#support-stash"><img alt="Donate" src="https://img.shields.io/badge/donate-%E2%99%A5-ff5c8a?style=for-the-badge"></a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/SalehTZ/telegram_music_player/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/SalehTZ/telegram_music_player?style=flat&logo=github&color=f8e444"></a>
-  <a href="https://github.com/SalehTZ/telegram_music_player/releases"><img alt="Downloads" src="https://img.shields.io/github/downloads/SalehTZ/telegram_music_player/total?label=downloads&logo=github"></a>
-  <a href="https://github.com/SalehTZ/telegram_music_player/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/SalehTZ/telegram_music_player/ci.yml?branch=main&label=CI&logo=githubactions&logoColor=white"></a>
+  <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22ir.salehtz.stash%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FSalehTZ%2FStash%22%2C%22author%22%3A%22SalehTZ%22%2C%22name%22%3A%22Stash%22%7D"><img alt="Get it on Obtainium" src="docs/badge_obtainium.png" height="54"></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/SalehTZ/Stash/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/SalehTZ/Stash?style=flat&logo=github&color=f8e444"></a>
+  <a href="https://github.com/SalehTZ/Stash/releases"><img alt="Downloads" src="https://img.shields.io/github/downloads/SalehTZ/Stash/total?label=downloads&logo=github"></a>
+  <a href="https://github.com/SalehTZ/Stash/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/SalehTZ/Stash/ci.yml?branch=main&label=CI&logo=githubactions&logoColor=white"></a>
 </p>
 
 <p align="center">
@@ -71,11 +75,13 @@ iTunes, Deezer or LRCLIB.
 
 ## Download
 
-Grab the latest build from **[Releases](https://github.com/SalehTZ/telegram_music_player/releases)**:
+Grab the latest build from **[Releases](https://github.com/SalehTZ/Stash/releases)**:
 
 | Platform | File |
 |---|---|
 | Android | `stash-android-arm64-v8a.apk` (most phones), `armeabi-v7a` for older ones, `x86_64` for emulators and Chromebooks |
+
+On Android, **[add Stash to Obtainium](https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22ir.salehtz.stash%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2FSalehTZ%2FStash%22%2C%22author%22%3A%22SalehTZ%22%2C%22name%22%3A%22Stash%22%7D)** to get updates straight from these releases.
 
 If you installed **v0.1.0**, uninstall it. That preview was still called Telegram
 Music Player and Android sees it as a different app, so Stash won't replace it.
@@ -133,7 +139,7 @@ The BNB Smart Chain and Ethereum addresses are the same. That's normal: both net
 
 You can also help for free:
 - ⭐ **Star the repo.** It helps other people find the app.
-- 🐛 **[Report bugs](https://github.com/SalehTZ/telegram_music_player/issues)** and suggest features.
+- 🐛 **[Report bugs](https://github.com/SalehTZ/Stash/issues)** and suggest features.
 - 📥 **Try [Snag](https://github.com/SalehTZ/snag)**, my free video and audio downloader.
 
 ## Where the songs come from
@@ -156,8 +162,8 @@ You need [Flutter 3.16](https://docs.flutter.dev/release/archive) (the version
 `pubspec.lock` was made with), the Android SDK and Java 17.
 
 ```sh
-git clone https://github.com/SalehTZ/telegram_music_player.git
-cd telegram_music_player
+git clone https://github.com/SalehTZ/Stash.git
+cd Stash
 flutter pub get
 flutter run
 
