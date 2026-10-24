@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../blocs/library/library_cubit.dart';
 import '../data/lyrics/lyrics.dart';
 import '../data/models/song_model.dart';
+import 'layout.dart';
 import 'screens/duplicates_screen/duplicates_screen.dart';
 import 'screens/edit_tags_screen/edit_tags_screen.dart';
 import 'screens/lyrics_screen/lyrics_screen.dart';
@@ -11,7 +12,9 @@ import 'screens/song_list_screen/song_list_screen.dart';
 import 'screens/tidy_screen/tidy_screen.dart';
 
 Future<T?> _push<T>(BuildContext context, Widget page) =>
-    Navigator.of(context).push<T>(MaterialPageRoute(builder: (_) => page));
+    Navigator.of(context).push<T>(
+      MaterialPageRoute(builder: (_) => ReadableWidth(child: page)),
+    );
 
 void openPlayer(BuildContext context) => _push(context, const PlayerScreen());
 

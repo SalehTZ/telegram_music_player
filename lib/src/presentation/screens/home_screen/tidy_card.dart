@@ -11,14 +11,20 @@ import '../../navigation.dart';
 /// and the way to take them out.
 class TidyCard extends StatelessWidget {
   final LibraryState state;
-  const TidyCard({super.key, required this.state});
+
+  /// In a row with another card: the row sets the space around it, and the
+  /// button keeps to the bottom so the buttons line up.
+  final bool sideBySide;
+  const TidyCard({super.key, required this.state, this.sideBySide = false});
 
   @override
   Widget build(BuildContext context) {
     final count = state.fixes.length;
     final channels = state.channels;
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: AppPadding.p20),
+      margin: sideBySide
+          ? null
+          : const EdgeInsets.symmetric(horizontal: AppPadding.p20),
       padding: const EdgeInsets.all(AppPadding.p20),
       decoration: const BoxDecoration(
         color: ColorManager.searchBarBackground,
@@ -66,6 +72,7 @@ class TidyCard extends StatelessWidget {
             ),
           ],
           AppGap.h20,
+          if (sideBySide) const Spacer(),
           FilledButton(
             onPressed: () => openTidy(context),
             child: const Text('Tidy up'),

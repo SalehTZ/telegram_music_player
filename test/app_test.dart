@@ -4,9 +4,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stash/src/blocs/library/library_cubit.dart';
 import 'package:stash/src/data/library/music_library.dart';
+import 'package:stash/src/presentation/screens/home_screen/duplicates_card.dart';
 import 'package:stash/src/presentation/screens/home_screen/tidy_card.dart';
 import 'package:stash/src/presentation/screens/player_screen/player_screen.dart';
 import 'package:stash/src/presentation/widgets/audio_player/mini_music_player.dart';
+import 'package:stash/src/presentation/widgets/audio_player/player_panel.dart';
 import 'package:stash/src/presentation/widgets/common/round_button/round_button_widget.dart';
 import 'package:stash/src/presentation/widgets/song_list_item/song_list_item_widget.dart';
 
@@ -225,5 +227,36 @@ void main() {
       find.text('Saved Song from a channel.mp3 to Music/Stash'),
       findsOneWidget,
     );
+  });
+
+  testWidgets('a wide window keeps the pages and the player in view',
+      (tester) async {
+    final semantics = tester.ensureSemantics();
+    await pumpApp(tester, size: const Size(1400, 900));
+    // * No drawer to open: the pages are listed beside the home page
+    expect(find.byType(RoundButtonWidget), findsNothing);
+    expect(find.text('Pick a song and it plays here.'), findsOneWidget);
+    expect(
+      tester.getTopLeft(find.byType(TidyCard)).dy,
+      tester.getTopLeft(find.byType(DuplicatesCard)).dy,
+    );
+
+    await tester.tap(find.text('Songs'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Blinding Lights').first);
+    await settlePlayer(tester);
+    expect(find.byType(MiniPlayer), findsNothing);
+    expect(
+      find.descendant(
+        of: find.byType(PlayerPanel),
+        matching: find.text('Blinding Lights'),
+      ),
+      findsOneWidget,
+    );
+    await tester.tap(find.bySemanticsLabel('Pause'));
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.bySemanticsLabel('Play'), findsOneWidget);
+    await closeApp(tester);
+    semantics.dispose();
   });
 }

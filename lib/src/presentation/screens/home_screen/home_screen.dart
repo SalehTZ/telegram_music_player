@@ -7,6 +7,7 @@ import '../../../constants/fonts_manager.dart';
 import '../../../constants/styles_manager.dart';
 import '../../../constants/values_manager.dart';
 import '../../../data/models/song_model.dart';
+import '../../layout.dart';
 import '../../navigation.dart';
 import '../../widgets/artist_thumbnail/artist_thumbnail_widget.dart';
 import '../../widgets/common/custom_list_builder/custom_list_builder.dart';
@@ -55,13 +56,37 @@ class _HomeScreenState extends State<HomeScreen> {
             if (query.isNotEmpty)
               ..._results(context, state.songs, query)
             else ...[
-              if (state.fixes.isNotEmpty) ...[
+              if (state.fixes.isNotEmpty &&
+                  state.duplicates.isNotEmpty &&
+                  Layout.isWide(context)) ...[
+                // * Room for both cards in one row
                 AppGap.h28,
-                TidyCard(state: state),
-              ],
-              if (state.duplicates.isNotEmpty) ...[
-                AppGap.h28,
-                DuplicatesCard(state: state),
+                Padding(
+                  padding: listPadding,
+                  child: IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(
+                          child: TidyCard(state: state, sideBySide: true),
+                        ),
+                        AppGap.w20,
+                        Expanded(
+                          child: DuplicatesCard(state: state, sideBySide: true),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ] else ...[
+                if (state.fixes.isNotEmpty) ...[
+                  AppGap.h28,
+                  TidyCard(state: state),
+                ],
+                if (state.duplicates.isNotEmpty) ...[
+                  AppGap.h28,
+                  DuplicatesCard(state: state),
+                ],
               ],
               if (state.recentlyPlayed.isNotEmpty) ...[
                 AppGap.h28,

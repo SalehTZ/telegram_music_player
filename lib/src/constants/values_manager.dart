@@ -64,7 +64,9 @@ class AppSize {
   static const double s162 = 162.0;
   static const double s172 = 172.0;
   static const double s210 = 210.0;
+  static const double s240 = 240.0;
   static const double s304 = 304.0;
+  static const double s360 = 360.0;
   static const double s390 = 390.0;
 }
 
@@ -73,6 +75,7 @@ class AppGap {
   static const w8 = SizedBox(width: AppSize.s8);
   static const w12 = SizedBox(width: AppSize.s12);
   static const w16 = SizedBox(width: AppSize.s16);
+  static const w20 = SizedBox(width: AppSize.s20);
   static const h4 = SizedBox(height: AppSize.s4);
   static const h8 = SizedBox(height: AppSize.s8);
   static const h10 = SizedBox(height: AppSize.s10);

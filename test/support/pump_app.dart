@@ -6,12 +6,13 @@ import 'package:stash/src/data/library/local_store.dart';
 import 'demo_library.dart';
 import 'fake_audio.dart';
 
-/// Starts the app on [library] in a phone-sized window.
+/// Starts the app on [library] in a phone-sized window, or one of [size].
 Future<DemoMusicLibrary> pumpApp(
   WidgetTester tester, {
   DemoMusicLibrary? library,
+  Size size = const Size(430, 932),
 }) async {
-  tester.view.physicalSize = const Size(430, 932);
+  tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
   final demo = library ?? DemoMusicLibrary();
