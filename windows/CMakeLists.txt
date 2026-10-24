@@ -57,6 +57,13 @@ add_subdirectory("runner")
 # them to the application.
 include(flutter/generated_plugins.cmake)
 
+# audio_service_win still includes <experimental/coroutine>, which newer
+# Visual Studio refuses unless told to allow it for now.
+if(TARGET audio_service_win_plugin)
+  target_compile_definitions(audio_service_win_plugin PRIVATE
+    _SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS)
+endif()
+
 
 # === Installation ===
 # Support files are copied into place next to the executable, so that it can

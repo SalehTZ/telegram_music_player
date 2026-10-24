@@ -34,10 +34,8 @@
 			<string>UIInterfaceOrientationLandscapeLeft</string>
 			<string>UIInterfaceOrientationLandscapeRight</string>
 		</array>
-		<dict>
-			<key>NSAppleMusicUsageDescription</key>
-			<string>$(PROJECT_NAME) requires access to media library</string>
-		</dict>
+		<key>NSAppleMusicUsageDescription</key>
+		<string>$(PROJECT_NAME) requires access to media library</string>
 		<key>UISupportedInterfaceOrientations~ipad</key>
 		<array>
 			<string>UIInterfaceOrientationPortrait</string>
