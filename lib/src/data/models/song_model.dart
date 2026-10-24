@@ -36,7 +36,7 @@ class Song {
   /// File format taken from the file extension, e.g. "MP3" or "FLAC".
   String get format {
     final dot = path.lastIndexOf('.');
-    if (dot == -1 || dot < path.lastIndexOf('/')) return '';
+    if (dot == -1 || dot < _lastSeparator(path)) return '';
     return path.substring(dot + 1).toUpperCase();
   }
 
@@ -52,13 +52,29 @@ class Song {
       duration.inMilliseconds == 0 ? 0 : size * 8 ~/ duration.inMilliseconds;
 
   String get folder {
-    final slash = path.lastIndexOf('/');
-    return slash <= 0 ? '/' : path.substring(0, slash);
+    final slash = _lastSeparator(path);
+    return slash <= 0 ? path.substring(0, slash + 1) : path.substring(0, slash);
   }
 
-  /// Saved from Telegram: "Music/Telegram", "Download/Telegram", or the
-  /// "Telegram Audio" folder older versions used.
-  bool get fromTelegram => folder.toLowerCase().contains('/telegram');
+  /// The file's name, e.g. "Song.mp3".
+  String get fileName => path.substring(_lastSeparator(path) + 1);
+
+  /// Saved from Telegram: "Music/Telegram", "Download/Telegram", the
+  /// "Telegram Audio" folder older versions used, or Telegram Desktop's
+  /// "Downloads/Telegram Desktop".
+  bool get fromTelegram =>
+      folder.toLowerCase().replaceAll('\\', '/').contains('/telegram');
+
+  /// Windows paths use backslashes.
+  static int _lastSeparator(String path) {
+    final slash = path.lastIndexOf('/');
+    final backslash = path.lastIndexOf('\\');
+    return slash > backslash ? slash : backslash;
+  }
+
+  /// The last part of a folder path, e.g. "Telegram".
+  static String folderName(String folder) =>
+      folder.substring(_lastSeparator(folder) + 1);
 
   String get artistOrUnknown => artist.isEmpty ? 'Unknown artist' : artist;
 

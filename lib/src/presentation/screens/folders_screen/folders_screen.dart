@@ -39,7 +39,7 @@ class FoldersScreen extends StatelessWidget {
               );
             }
             final folder = folders[index - 1];
-            final name = folder.name.split('/').last;
+            final name = Song.folderName(folder.name);
             return CollectionRow(
               cover: folder.songs.first,
               title: name,

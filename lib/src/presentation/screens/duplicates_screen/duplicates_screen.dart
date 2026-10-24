@@ -161,7 +161,7 @@ class _CopyRow extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    song.path.split('/').last,
+                    song.fileName,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyles.getMediumStyle(
