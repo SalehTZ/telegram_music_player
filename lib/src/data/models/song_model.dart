@@ -1,3 +1,5 @@
+import '../tags/tags.dart';
+
 /// A song in the phone's media library.
 class Song {
   /// The media library's id for the file.
@@ -42,8 +44,8 @@ class Song {
   /// [id] it means the same file on every platform and after a rescan.
   String get key => path;
 
-  /// Stash can only rewrite the tags of MP3 files.
-  bool get canEditTags => format == 'MP3';
+  /// Stash can rewrite the tags of MP3, FLAC, Ogg, Opus and M4A files.
+  bool get canEditTags => editableFormats.contains(format);
 
   String get folder {
     final slash = path.lastIndexOf('/');

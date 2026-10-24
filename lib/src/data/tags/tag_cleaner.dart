@@ -1,4 +1,4 @@
-import 'id3.dart';
+import 'tags.dart';
 
 /// Telegram channels stamp themselves into the tags of the songs they share:
 /// "Song @SomeChannel", "Artist | t.me/somechannel", "Album (Join @channel)".

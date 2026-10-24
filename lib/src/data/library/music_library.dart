@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import '../models/song_model.dart';
-import '../tags/id3.dart';
+import '../tags/tags.dart';
 
 /// What became of asking for the permission to read music. [blocked] means
 /// Android won't ask again, so only the system settings can grant it.
@@ -24,14 +24,14 @@ abstract class MusicLibrary {
   /// The cover embedded in [song], about [size] pixels wide.
   Future<Uint8List?> artwork(Song song, int size);
 
-  /// The ID3 tag of an MP3 file, or null when it has none.
-  Future<Id3Tag?> readTag(Song song);
+  /// The tags in the song's file, or null when it has none.
+  Future<SongTag?> readTag(Song song);
 
   /// Asks once to change [songs]. Android 11 and later show a system dialog
   /// for files other apps saved, like the ones from Telegram.
   Future<bool> requestWriteAccess(List<Song> songs);
 
-  /// Writes [edit] into the MP3 file and waits until the library knows.
+  /// Writes [edit] into the song's file and waits until the library knows.
   Future<void> writeTag(Song song, TagEdit edit);
 
   /// Songs shared to Stash from other apps, after they were saved to

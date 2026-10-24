@@ -51,10 +51,10 @@ them and cleans them up.
 - **Tidy up.** Stash finds every song with a channel stamp, shows each tag
   before and after, and cleans them all after one OK from Android. Files with
   no artist named `Artist - Title` are split into the two.
-- **Tag editor.** Title, artist, album, year, genre, lyrics and cover. Stash
-  writes ID3v2.3 and v2.4 itself and keeps the frames it doesn't know about.
-  When the new tag fits in the old one's space, only the tag is written and
-  the audio is never touched.
+- **Tag editor.** Title, artist, album, year, genre, lyrics and cover, for
+  MP3, FLAC, Ogg Vorbis, Opus and M4A. Stash writes the tags itself and keeps
+  the ones it doesn't know about. When the new tags fit in the old space,
+  only the tags are written and the audio is never touched.
 - **Covers and lyrics.** Find a cover on iTunes or Deezer, and lyrics on
   LRCLIB, time-synced line by line when it has them. Save either into the
   song.
@@ -64,8 +64,8 @@ them and cleans them up.
   controls, shuffle, repeat, play next, favorites, playlists, recently played
   and added, artists, folders and search.
 
-Not yet: changing the tags of M4A, FLAC or OGG files. Stash shows them and
-plays them, and tells you when it can't change one.
+Other formats, like WMA, are shown and played, and Stash tells you when it
+can't change one.
 
 ### Privacy
 

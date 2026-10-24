@@ -10,14 +10,14 @@ import '../../../constants/styles_manager.dart';
 import '../../../constants/values_manager.dart';
 import '../../../data/library/artwork_cache.dart';
 import '../../../data/models/song_model.dart';
-import '../../../data/tags/id3.dart';
+import '../../../data/tags/tags.dart';
 import '../../../data/tags/tag_cleaner.dart';
 import '../../widgets/appbar/appbar_widget.dart';
 import '../../widgets/common/artwork/artwork_image.dart';
 import '../../widgets/common/page_title/page_title.dart';
 import 'cover_search_screen.dart';
 
-/// Title, artist, album, year, genre, lyrics and cover of one MP3 file.
+/// Title, artist, album, year, genre, lyrics and cover of one song.
 class EditTagsScreen extends StatefulWidget {
   final Song song;
   const EditTagsScreen({super.key, required this.song});
@@ -55,12 +55,12 @@ class _EditTagsScreenState extends State<EditTagsScreen> {
   }
 
   Future<void> _load() async {
-    Id3Tag? tag;
+    SongTag? tag;
     try {
       tag = await context.read<LibraryCubit>().library.readTag(song);
     } on Exception catch (e) {
       _locked = true;
-      _error = e is Id3Exception
+      _error = e is TagException
           ? "${e.message}, so Stash can't change this file."
           : "Couldn't read the file's tags.";
     }
@@ -178,8 +178,8 @@ class _EditTagsScreenState extends State<EditTagsScreen> {
                 if (!song.canEditTags) ...[
                   AppGap.h16,
                   _Notice(
-                    text: 'Stash can change the tags of MP3 files only. '
-                        'This one is ${song.format}.',
+                    text: 'Stash can change the tags of MP3, FLAC, Ogg, '
+                        'Opus and M4A files. This one is ${song.format}.',
                   ),
                 ],
                 if (song.canEditTags && hasStamps) ...[

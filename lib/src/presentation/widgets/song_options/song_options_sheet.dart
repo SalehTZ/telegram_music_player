@@ -126,8 +126,9 @@ class _SongOptionsSheet extends StatelessWidget {
             _Option(
               icon: Icons.edit_outlined,
               label: song.canEditTags ? 'Edit tags and cover' : 'Tags',
-              detail:
-                  song.canEditTags ? null : 'Stash can change MP3 files only',
+              detail: song.canEditTags
+                  ? null
+                  : "Stash can't change ${song.format} files",
               onTap: () {
                 final page = Navigator.of(context);
                 page.pop();

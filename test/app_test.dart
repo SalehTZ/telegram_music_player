@@ -54,11 +54,12 @@ void main() {
     expect(library.settingsOpened, 1);
   });
 
-  testWidgets('tidy up cleans every stamped MP3 after one OK', (tester) async {
+  testWidgets('tidy up cleans every stamped song it can after one OK',
+      (tester) async {
     final library = await pumpApp(tester);
     await tester.tap(find.text('Tidy up'));
     await tester.pumpAndSettle();
-    expect(find.text("Not MP3, so Stash can't change these"), findsOneWidget);
+    expect(find.text("Stash can't change these files"), findsOneWidget);
 
     await tester.tap(find.text('Clean 6 songs'));
     await tester.pumpAndSettle();
@@ -71,7 +72,7 @@ void main() {
     expect(library.byTitle('R U Mine').artist, 'Arctic Monkeys');
     expect(library.byTitle('امیر').title, 'امیر بی گزند');
     expect(library.byTitle('Cruel Summer').album, 'Lover');
-    // * The FLAC is left alone
+    // * The WMA is left alone
     expect(
         library.byTitle('Instant Crush').title, 'Instant Crush @MusicArchive');
     // * And the cleaned tags kept what wasn't stamped

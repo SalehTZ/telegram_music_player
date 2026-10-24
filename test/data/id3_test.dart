@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stash/src/data/tags/id3.dart';
+import 'package:stash/src/data/tags/tags.dart';
 
 /// Fake MPEG audio: frame sync bytes, then a pattern we can check survived.
 final audio = Uint8List.fromList(
@@ -120,13 +121,13 @@ void main() {
     Uint8List header(int version, int flags) => Uint8List.fromList(
         [...ascii.encode('ID3'), version, 0, flags, 0, 0, 0, 0, ...audio]);
     expect(() => writeId3(header(2, 0), const TagEdit(title: 'x')),
-        throwsA(isA<Id3Exception>()));
+        throwsA(isA<TagException>()));
     expect(() => writeId3(header(3, 0x80), const TagEdit(title: 'x')),
-        throwsA(isA<Id3Exception>()));
+        throwsA(isA<TagException>()));
 
     final damaged = v24File()
       ..[16] = 0x7f; // * TIT2's size now runs past the tag
     expect(() => writeId3(damaged, const TagEdit(title: 'x')),
-        throwsA(isA<Id3Exception>()));
+        throwsA(isA<TagException>()));
   });
 }
