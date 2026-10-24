@@ -4,8 +4,7 @@ import 'dart:typed_data';
 
 /// Small GET helpers on dart:io, for the free music APIs the app uses.
 class Web {
-  static const _userAgent =
-      'Stash/0.1 (https://github.com/SalehTZ/Stash)';
+  static const _userAgent = 'Stash/0.1 (https://github.com/SalehTZ/Stash)';
   static const _timeout = Duration(seconds: 15);
 
   /// The response body, or null on a 404.
