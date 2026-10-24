@@ -12,7 +12,7 @@ concurrency:
 
 env:
   # Keep in sync with the Flutter version used to create pubspec.lock.
-  FLUTTER_VERSION: "3.16.9"
+  FLUTTER_VERSION: "3.47.8"
 
 jobs:
   check:

@@ -158,7 +158,7 @@ tidy-up together.
 
 ## Build it yourself
 
-You need [Flutter 3.16](https://docs.flutter.dev/release/archive) (the version
+You need [Flutter 3.47](https://docs.flutter.dev/release/archive) (the version
 `pubspec.lock` was made with), the Android SDK and Java 17.
 
 ```sh
