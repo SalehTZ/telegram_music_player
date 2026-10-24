@@ -7,7 +7,7 @@ import '../../../constants/fonts_manager.dart';
 import '../../../constants/styles_manager.dart';
 import '../../../constants/values_manager.dart';
 import '../../../data/models/song_model.dart';
-import '../common/album_art_widget/album_art_image_large.dart';
+import '../common/artwork/artwork_image.dart';
 
 class SongThumbnailWidget extends StatelessWidget {
   final Song song;
@@ -40,7 +40,11 @@ class SongThumbnailWidget extends StatelessWidget {
             // * album art image
             Stack(
               children: [
-                LargeAlbumArtImage(imageData: song.albumArtUrl),
+                ArtworkImage(
+                  song: song,
+                  size: AppSize.s162,
+                  borderRadius: const BorderRadius.all(AppRadius.rad12),
+                ),
                 const Positioned(
                   left: AppPadding.p8,
                   bottom: AppPadding.p8,
@@ -61,7 +65,7 @@ class SongThumbnailWidget extends StatelessWidget {
             AppGap.h8,
             // * Artist name
             Text(
-              song.artist,
+              song.artistOrUnknown,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyles.getLightStyle(fontSize: FontSize.s14),

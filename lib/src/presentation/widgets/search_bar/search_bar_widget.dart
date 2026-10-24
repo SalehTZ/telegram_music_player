@@ -9,11 +9,15 @@ import '../../../constants/values_manager.dart';
 
 class SearchBarWidget extends StatelessWidget {
   final String hintText;
+  final String? initialText;
   final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onSubmitted;
   const SearchBarWidget({
     super.key,
     this.hintText = 'Search for songs',
+    this.initialText,
     this.onChanged,
+    this.onSubmitted,
   });
 
   @override
@@ -36,10 +40,13 @@ class SearchBarWidget extends StatelessWidget {
           ),
           AppGap.w12,
           Expanded(
-            child: TextField(
+            child: TextFormField(
+              initialValue: initialText,
               maxLines: 1,
               minLines: 1,
+              textInputAction: TextInputAction.search,
               onChanged: onChanged,
+              onFieldSubmitted: onSubmitted,
               cursorColor: ColorManager.primaryEnabledColor,
               style: TextStyles.getLightStyle(fontSize: FontSize.s18),
               decoration: InputDecoration(
@@ -49,7 +56,10 @@ class SearchBarWidget extends StatelessWidget {
                   color: ColorManager.lightGrey,
                   fontSize: FontSize.s18,
                 ),
+                // * Not the filled field of the app's theme
+                filled: false,
                 border: InputBorder.none,
+                focusedBorder: InputBorder.none,
               ),
               onTapOutside: (event) =>
                   FocusManager.instance.primaryFocus?.unfocus(),

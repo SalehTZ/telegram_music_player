@@ -1,4 +1,4 @@
-// Renders the launcher icons and the README icon from the mark in code, so
+// Renders the launcher, notification and README icons from the mark in code, so
 // the logo stays editable in one place:
 //
 //   flutter test tool/icon/render_icon_test.dart
@@ -48,6 +48,14 @@ Widget _tile(double px) => Padding(
       ),
     );
 
+/// The white mark for the playback notification, 24dp with 2dp of air.
+Widget _notification(double px) => Center(
+      child: CustomPaint(
+        size: Size.square(px * 20 / 24),
+        painter: const StashMarkPainter(silhouette: true),
+      ),
+    );
+
 /// The mark alone, sized to stay inside the adaptive icon's safe zone.
 Widget _foreground(double px) => Center(child: StashMark(size: px * 0.5));
 
@@ -59,6 +67,8 @@ void main() {
           _tile(48 * scale));
       await _render(tester, '$_res/mipmap-$name/ic_launcher_foreground.png',
           108 * scale, _foreground(108 * scale));
+      await _render(tester, '$_res/drawable-$name/ic_notification.png',
+          24 * scale, _notification(24 * scale));
     }
     await _render(tester, 'docs/icon.png', 512, _tile(512));
   });

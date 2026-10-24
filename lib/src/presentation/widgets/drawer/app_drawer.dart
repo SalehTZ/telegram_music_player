@@ -12,6 +12,8 @@ import '../common/logo/stash_mark.dart';
 
 enum DrawerPage { home, folders, playlists, songs }
 
+const _version = String.fromEnvironment('APP_VERSION');
+
 class AppDrawer extends StatelessWidget {
   final ValueChanged<DrawerPage> onPageSelected;
   const AppDrawer({
@@ -85,11 +87,12 @@ class AppDrawer extends StatelessWidget {
                   ),
 
                   const Spacer(),
-                  // * App version
-                  Text(
-                    "version 1.0.0:21",
-                    style: TextStyles.getRegularStyle(),
-                  ),
+                  // * App version, set by the release build
+                  if (_version.isNotEmpty)
+                    Text(
+                      "version $_version",
+                      style: TextStyles.getRegularStyle(),
+                    ),
                   AppGap.h8,
                 ],
               ),

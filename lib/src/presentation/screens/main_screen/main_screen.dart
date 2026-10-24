@@ -1,15 +1,19 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../blocs/library/library_cubit.dart';
+import '../../../blocs/player/player_cubit.dart';
 import '../../../constants/colors_manager.dart';
-import '../../../constants/values_manager.dart';
-import '../../../data/fake_music_data.dart';
-import '../../../data/models/song_model.dart';
 import '../../widgets/appbar/appbar_widget.dart';
-import '../../widgets/audio_player/mini_music_player.dart';
+import '../../widgets/audio_player/now_playing_bar.dart';
 import '../../widgets/drawer/app_drawer.dart';
+import '../folders_screen/folders_screen.dart';
 import '../home_screen/home_screen.dart';
-import '../player_screen/player_screen.dart';
+import '../playlists_screen/playlists_screen.dart';
 import '../songs_screen/songs_screen.dart';
+import 'library_gate.dart';
 
 /// Holds the app bar, drawer and mini player, and switches the page
 /// in between when an item of the drawer is picked.
@@ -20,41 +24,48 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   DrawerPage _page = DrawerPage.home;
+  late final List<StreamSubscription<String>> _messages;
 
-  void _onPageSelected(DrawerPage page) {
-    // TODO add the folders and playlists pages once they are designed
-    if (page == DrawerPage.folders || page == DrawerPage.playlists) return;
-    setState(() => _page = page);
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    void show(String message) => ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+    _messages = [
+      context.read<LibraryCubit>().notices.listen(show),
+      context.read<PlayerCubit>().errors.listen(show),
+    ];
   }
 
-  void _openPlayer(Song song, {Duration position = Duration.zero}) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => PlayerScreen(
-          song: song,
-          initialPosition: position,
-        ),
-      ),
-    );
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    for (final m in _messages) {
+      m.cancel();
+    }
+    super.dispose();
+  }
+
+  // * Back from Telegram or the settings: pick up new songs or the permission
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      context.read<LibraryCubit>().refresh();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    const miniPlayerSpace = MiniPlayer.height + AppPadding.p8 * 2;
-    final contentBottomPadding =
-        miniPlayerSpace + AppPadding.p20 + MediaQuery.paddingOf(context).bottom;
+    final bottom = WithNowPlaying.bottomSpace(context);
     final page = switch (_page) {
-      DrawerPage.songs => SongsScreen(
-          bottomPadding: contentBottomPadding,
-          onSongTap: _openPlayer,
-        ),
-      _ => HomeScreen(
-          bottomPadding: contentBottomPadding,
-          onSongTap: _openPlayer,
-        ),
+      DrawerPage.home => HomeScreen(bottomPadding: bottom),
+      DrawerPage.folders => FoldersScreen(bottomPadding: bottom),
+      DrawerPage.playlists => PlaylistsScreen(bottomPadding: bottom),
+      DrawerPage.songs => SongsScreen(bottomPadding: bottom),
     };
 
     return PopScope(
@@ -71,34 +82,15 @@ class _MainScreenState extends State<MainScreen> {
       child: Scaffold(
         key: _scaffoldKey,
         appBar: const AppBarWidget(),
-        drawer: AppDrawer(onPageSelected: _onPageSelected),
+        drawer: AppDrawer(
+          onPageSelected: (page) => setState(() => _page = page),
+        ),
         drawerScrimColor: ColorManager.transparent,
-        body: Stack(
-          children: [
-            Positioned.fill(child: page),
-
-            // * Mini player floating over the page
-            Positioned(
-              left: AppPadding.p20,
-              right: AppPadding.p20,
-              bottom: AppPadding.p8,
-              child: SafeArea(
-                top: false,
-                child: MiniPlayer(
-                  song: fakeNowPlayingSong,
-                  progress: fakeNowPlayingPosition.inMilliseconds /
-                      fakeNowPlayingSong.duration.inMilliseconds,
-                  onTap: () => _openPlayer(
-                    fakeNowPlayingSong,
-                    position: fakeNowPlayingPosition,
-                  ),
-                  // TODO connect to the AudioPlayerBloc
-                  onPlayPause: () {},
-                  onSkipNext: () {},
-                ),
-              ),
-            ),
-          ],
+        body: BlocBuilder<LibraryCubit, LibraryState>(
+          buildWhen: (a, b) => a.status != b.status,
+          builder: (context, state) => state.status == LibraryStatus.ready
+              ? WithNowPlaying(child: page)
+              : LibraryGate(status: state.status),
         ),
       ),
     );

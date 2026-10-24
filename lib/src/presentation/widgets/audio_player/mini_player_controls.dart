@@ -45,7 +45,7 @@ class MiniPlayerControls extends StatelessWidget {
                   ),
                   AppGap.h4,
                   Text(
-                    song.artist,
+                    song.artistOrUnknown,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyles.getRegularStyle(

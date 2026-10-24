@@ -19,7 +19,9 @@ class StashMark extends StatelessWidget {
 }
 
 class StashMarkPainter extends CustomPainter {
-  const StashMarkPainter();
+  /// All white, for Android's notification icon, which only keeps the shape.
+  final bool silhouette;
+  const StashMarkPainter({this.silhouette = false});
 
   // * Drawn on a 100 x 100 grid
   static const _record = Offset(64, 36);
@@ -48,7 +50,10 @@ class StashMarkPainter extends CustomPainter {
       ..drawCircle(
         _record,
         26,
-        Paint()..color = ColorManager.primaryEnabledColor,
+        Paint()
+          ..color = silhouette
+              ? ColorManager.white
+              : ColorManager.primaryEnabledColor,
       )
       ..drawCircle(_record, 9, clear)
       ..drawCircle(_record, 2.4, Paint()..color = ColorManager.white)
@@ -65,5 +70,6 @@ class StashMarkPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(StashMarkPainter oldDelegate) => false;
+  bool shouldRepaint(StashMarkPainter oldDelegate) =>
+      oldDelegate.silhouette != silhouette;
 }

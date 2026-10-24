@@ -27,6 +27,10 @@ class ColorManager {
   static const Color progressTrack = Color(0xFF9D9C9C);
   static const Color progressFill = Color(0xFFFEFEFE);
   static const Color listSeparator = white;
+  static const Color sheetBackground = Color(0xFF1C1C1C);
+  static const Color artworkPlaceholder = Color(0xFF232323);
+  static const Color faintText = Color(0x33FFFFFF); // white 20%
+  static const Color hairline = Color(0x1AFFFFFF); // white 10%
 
   //* Primary Colors
   static Color primaryMaterial = HexColor.toMaterialColor(0xFF5947B2);

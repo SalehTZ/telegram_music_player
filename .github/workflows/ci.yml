@@ -29,10 +29,6 @@ jobs:
           channel: stable
           cache: true
 
-      # assets/audio is listed in pubspec.yaml but its contents are git-ignored.
-      - name: Create git-ignored asset folder
-        run: mkdir -p assets/audio
-
       - name: Install dependencies
         run: flutter pub get
 
@@ -62,9 +58,6 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
-
-      - name: Create git-ignored asset folder
-        run: mkdir -p assets/audio
 
       - name: Install dependencies
         run: flutter pub get

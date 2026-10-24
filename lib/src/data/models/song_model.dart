@@ -1,34 +1,60 @@
-import 'package:flutter/foundation.dart';
-
+/// A song in the phone's media library.
 class Song {
+  /// The media library's id for the file.
+  final int id;
   final String title;
+
+  /// Empty when the file doesn't name one.
   final String artist;
   final String album;
-  final String filePath; // Or a URL if streaming from the internet
-  final Duration duration;
-  final Uint8List? albumArtUrl; // URL to the album art image
-  final int? rating; // Rating out of 5
-  final String? genre;
-  final int? releaseDate;
-  final String? lyrics; // Unsynced lyrics, one line per row
 
-  Song({
+  /// Where the file is, e.g. "/storage/emulated/0/Music/Telegram/x.mp3".
+  final String path;
+
+  /// The media library's content URI for the file, used to play and write it.
+  final String uri;
+  final Duration duration;
+  final DateTime added;
+
+  /// File size in bytes.
+  final int size;
+
+  const Song({
+    required this.id,
     required this.title,
     required this.artist,
     required this.album,
-    required this.filePath,
+    required this.path,
+    required this.uri,
     required this.duration,
-    this.albumArtUrl,
-    this.rating,
-    this.genre,
-    this.releaseDate,
-    this.lyrics,
+    required this.added,
+    this.size = 0,
   });
 
   /// File format taken from the file extension, e.g. "MP3" or "FLAC".
   String get format {
-    final dotIndex = filePath.lastIndexOf('.');
-    if (dotIndex == -1 || dotIndex == filePath.length - 1) return '';
-    return filePath.substring(dotIndex + 1).toUpperCase();
+    final dot = path.lastIndexOf('.');
+    if (dot == -1 || dot < path.lastIndexOf('/')) return '';
+    return path.substring(dot + 1).toUpperCase();
   }
+
+  /// Stash can only rewrite the tags of MP3 files.
+  bool get canEditTags => format == 'MP3';
+
+  String get folder {
+    final slash = path.lastIndexOf('/');
+    return slash <= 0 ? '/' : path.substring(0, slash);
+  }
+
+  /// Saved from Telegram: "Music/Telegram", "Download/Telegram", or the
+  /// "Telegram Audio" folder older versions used.
+  bool get fromTelegram => folder.toLowerCase().contains('/telegram');
+
+  String get artistOrUnknown => artist.isEmpty ? 'Unknown artist' : artist;
+
+  @override
+  bool operator ==(Object other) => other is Song && other.id == id;
+
+  @override
+  int get hashCode => id.hashCode;
 }

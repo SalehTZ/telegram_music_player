@@ -1,7 +1,5 @@
 const String _assetsFolder = "assets";
-const String _imagesFolder = "$_assetsFolder/images";
 const String _iconsFolder = "$_assetsFolder/icons";
-const String _audioFolder = "$_assetsFolder/audio";
 
 class AssetsManager {
   // * App bar icons
@@ -30,8 +28,4 @@ class AssetsManager {
   static const libraryIcon = "$_iconsFolder/library.svg";
   static const songIcon = "$_iconsFolder/song.svg";
   static const albumIcon = "$_iconsFolder/album.svg";
-
-  static const tempSong = "$_audioFolder/R U Mine - Arctic Monkeys.mp3";
-
-  static const defaultSongThumbnail = "$_imagesFolder/default_thumbnail.png";
 }

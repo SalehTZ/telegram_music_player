@@ -22,36 +22,52 @@
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/home.png" width="200" alt="Home">
-  <img src="docs/screenshots/songs.png" width="200" alt="Songs">
-  <img src="docs/screenshots/drawer.png" width="200" alt="Drawer">
-  <img src="docs/screenshots/player.png" width="200" alt="Player">
+  <img src="docs/screenshots/home.png" width="200" alt="Home, with the songs that need tidying">
+  <img src="docs/screenshots/tidy.png" width="200" alt="Tidy up: every tag before and after">
+  <img src="docs/screenshots/player.png" width="200" alt="Player with synced lyrics">
+  <img src="docs/screenshots/edit.png" width="200" alt="Tag editor">
 </p>
-
-> **Status:** early development. The app's screens are in place and run on demo
-> data; reading your music library and real playback come next.
+<p align="center">
+  <img src="docs/screenshots/songs.png" width="200" alt="Songs">
+  <img src="docs/screenshots/folders.png" width="200" alt="Folders, Telegram's first">
+  <img src="docs/screenshots/drawer.png" width="200" alt="Menu">
+</p>
+<p align="center"><sub>Screenshots from a demo library.</sub></p>
 
 ---
 
 ## Why Stash?
 
 Telegram is where a lot of us find music: channels, groups, friends sending
-songs. But those files end up scattered, with titles like `@SomeChannel - track 03`
-and no cover art. Stash gathers them in one place and cleans them up.
+songs. But those files arrive with the channel's name stamped into them
+(`Song @SomeChannel`, `Artist | t.me/somechannel`, `Album (Join @channel)`),
+or with no tags at all and a file name like `Artist - Title.mp3`. Stash plays
+them and cleans them up.
 
-Done:
+- **Tidy up.** Stash finds every song with a channel stamp, shows each tag
+  before and after, and cleans them all after one OK from Android. Files with
+  no artist named `Artist - Title` are split into the two.
+- **Tag editor.** Title, artist, album, year, genre, lyrics and cover. Stash
+  writes ID3v2.3 and v2.4 itself and keeps the frames it doesn't know about.
+  When the new tag fits in the old one's space, only the tag is written and
+  the audio is never touched.
+- **Covers and lyrics.** Find a cover on iTunes or Deezer, and lyrics on
+  LRCLIB, time-synced line by line when it has them. Save either into the
+  song.
+- **Share to Stash.** In Telegram, share a song to Stash and it's saved to
+  `Music/Stash`, out of Telegram's private folder.
+- **A real player.** Background playback with notification and lock-screen
+  controls, shuffle, repeat, play next, favorites, playlists, recently played
+  and added, artists, folders and search.
 
-- **Home** with recently played songs, artists and favorites
-- **Songs** list with format and duration
-- **Now playing** screen with controls, a seek bar and a lyrics preview
-- **Mini player** floating over your library
+Not yet: changing the tags of M4A, FLAC or OGG files. Stash shows them and
+plays them, and tells you when it can't change one.
 
-Coming next:
+### Privacy
 
-- Playback with `just_audio` and `audio_service`
-- Your library from the `Music/Telegram` and `Download/Telegram` folders
-- A tag editor for title, artist, album, cover and lyrics
-- Album cover and lyrics search
+Stash has no account, no ads and no analytics. It only goes online when you
+search for a cover or lyrics, and then it sends the song's title and artist to
+iTunes, Deezer or LRCLIB.
 
 ## Download
 
@@ -123,10 +139,16 @@ You can also help for free:
 ## Where the songs come from
 
 Telegram keeps its downloads in `Android/data/org.telegram.messenger/`, and
-since Android 11 no other app can read that folder. Songs saved with
-Telegram's **Save to Music** (`Music/Telegram`) or **Save to Downloads**
-(`Download/Telegram`) are in shared storage, so the app can find them through
-Android's media library.
+since Android 11 no other app can read that folder. To bring a song over:
+
+- in Telegram, open the song's menu and tap **Save to Music** (it lands in
+  `Music/Telegram`) or **Save to Downloads** (`Download/Telegram`), or
+- **share** the song to Stash, which saves it to `Music/Stash`.
+
+Stash reads them through Android's media library, so it only asks for
+**Music and audio**. Android 11 and later also ask once before Stash changes
+files another app saved, like Telegram's; Stash asks for all the songs of a
+tidy-up together.
 
 ## Build it yourself
 
@@ -136,7 +158,6 @@ You need [Flutter 3.16](https://docs.flutter.dev/release/archive) (the version
 ```sh
 git clone https://github.com/SalehTZ/telegram_music_player.git
 cd telegram_music_player
-mkdir -p assets/audio   # listed in pubspec.yaml, but its contents are git-ignored
 flutter pub get
 flutter run
 
@@ -162,20 +183,29 @@ flutter test test/screenshots_test.dart --dart-define=SCREENSHOT_DIR=docs/screen
 
 ```text
 lib/
-  main.dart                 entry point
+  main.dart                 entry point, background playback setup
   src/
-    app.dart                MaterialApp, theme and the root bloc
-    blocs/                  state management (flutter_bloc)
+    app.dart                MaterialApp, theme and the library and player cubits
+    blocs/
+      library/              songs, favorites, history, playlists, tidy-up
+      player/               playback on just_audio
     constants/              colors, fonts, text styles, sizes and asset paths
-    data/                   models and demo data
+    data/
+      library/              the phone's media library, covers, saved state
+      tags/                 ID3 reader and writer, channel stamp cleaner
+      lyrics/               LRC and plain lyrics
+      online/               cover (iTunes, Deezer) and lyrics (LRCLIB) search
     presentation/
-      screens/              main shell, home, songs and player
+      screens/              home, songs, folders, playlists, player, lyrics,
+                            tag editor, cover search and tidy-up
       widgets/              reusable widgets
     utils/                  small helpers
+android/app/src/main/java/  MainActivity: media library, file writes, sharing
 assets/
   fonts/                    Poppins
   icons/                    SVG icons exported from the design
-  images/                   default album art
+test/
+  support/                  a demo library and a fake player for tests
 ```
 
 ## Releases
@@ -230,5 +260,8 @@ Without that file, release builds use the debug key, which is fine for testing.
 ## Credits
 
 - The UI follows the project's Figma design.
+- Covers from the [iTunes Search API](https://performance-partners.apple.com/search-api)
+  and the [Deezer API](https://developers.deezer.com/api), lyrics from
+  [LRCLIB](https://lrclib.net).
 - [Poppins](https://github.com/itfoundry/Poppins) font, licensed under the SIL
   Open Font License 1.1 (see `assets/fonts/Poppins-OFL.txt`).
