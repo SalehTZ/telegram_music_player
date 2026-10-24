@@ -1,5 +1,5 @@
 name: telegram_music_player
-description: "A new Flutter project."
+description: "A music player for the songs you collect on Telegram."
 publish_to: "none"
 version: 0.1.0
 
