@@ -33,6 +33,24 @@ Future<void> openMenuOf(WidgetTester tester, String title) async {
   await tester.pumpAndSettle();
 }
 
+/// The demo songs, with folders the user picks, as on a computer.
+class _PickedDemoLibrary extends DemoMusicLibrary implements PickedFolders {
+  @override
+  final folders = ['/music'];
+
+  @override
+  Future<bool> addFolder(String path) async {
+    folders.add(path);
+    return true;
+  }
+
+  @override
+  Future<void> removeFolder(String path) async => folders.remove(path);
+
+  @override
+  Future<int> importPaths(List<String> paths) async => 0;
+}
+
 void main() {
   testWidgets('asks for access to music, then shows the library',
       (tester) async {
@@ -229,6 +247,22 @@ void main() {
       find.text('Saved Song from a channel.mp3 to Music/Stash'),
       findsOneWidget,
     );
+  });
+
+  testWidgets('an added folder shows up in the list right away',
+      (tester) async {
+    await pumpApp(tester, library: _PickedDemoLibrary());
+    await openPage(tester, 'Folders');
+    expect(find.text('/music'), findsOneWidget);
+
+    final cubit = tester.element(find.text('/music')).read<LibraryCubit>();
+    await cubit.addFolder('/albums');
+    await tester.pumpAndSettle();
+    expect(find.text('/albums'), findsOneWidget);
+
+    await cubit.removeFolder('/music');
+    await tester.pumpAndSettle();
+    expect(find.text('/music'), findsNothing);
   });
 
   testWidgets('a wide window keeps the pages and the player in view',

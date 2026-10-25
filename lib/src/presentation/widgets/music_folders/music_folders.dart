@@ -30,7 +30,9 @@ class MusicFolders extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<LibraryCubit>();
+    // * Watched, not read: the list lives in the library, not the state, so
+    // * only a new state after a folder is added or removed shows the change
+    final cubit = context.watch<LibraryCubit>();
     final folders = cubit.pickedFolders?.folders ?? const [];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

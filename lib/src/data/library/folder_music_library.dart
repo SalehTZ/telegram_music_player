@@ -112,14 +112,18 @@ class FolderMusicLibrary implements MusicLibrary, PickedFolders {
   static String _clean(String path) {
     final sep = Platform.pathSeparator;
     final absolute = Directory(path).absolute.path;
-    return absolute.length > 1 && absolute.endsWith(sep)
-        ? absolute.substring(0, absolute.length - 1)
-        : absolute;
+    if (absolute.length <= 1 || !absolute.endsWith(sep)) return absolute;
+    final trimmed = absolute.substring(0, absolute.length - 1);
+    // * "D:\\" stays as it is: "D:" is the folder Windows is in on drive D
+    return trimmed.endsWith(':') ? absolute : trimmed;
   }
 
   /// Whether [path] is [folder] or somewhere inside it.
-  static bool _inside(String path, String folder) =>
-      path == folder || path.startsWith('$folder${Platform.pathSeparator}');
+  static bool _inside(String path, String folder) {
+    final sep = Platform.pathSeparator;
+    return path == folder ||
+        path.startsWith(folder.endsWith(sep) ? folder : '$folder$sep');
+  }
 
   @override
   Future<bool> addFolder(String path) async {
@@ -209,8 +213,12 @@ class FolderMusicLibrary implements MusicLibrary, PickedFolders {
       final folder = Directory(root);
       if (!await folder.exists()) continue;
       dirs.add(folder.path);
-      await for (final entry
-          in folder.list(recursive: true, followLinks: false)) {
+      final entries = folder
+          .list(recursive: true, followLinks: false)
+          // * A folder Stash can't open, like "System Volume Information" on
+          // * a drive, is skipped instead of ending the whole scan
+          .handleError((_) {}, test: (e) => e is FileSystemException);
+      await for (final entry in entries) {
         if (entry is Directory) dirs.add(entry.path);
         if (entry is! File) continue;
         final path = entry.path;
