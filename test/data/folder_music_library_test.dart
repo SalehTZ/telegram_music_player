@@ -92,6 +92,18 @@ void main() {
     expect(songs, isEmpty);
   });
 
+  test('a folder it can\'t open is skipped, not the whole scan', () async {
+    final locked = await Directory('${music.path}/Locked').create();
+    await File('test/fixtures/sine.ogg').copy('${locked.path}/sine.ogg');
+    await Process.run('chmod', ['000', locked.path]);
+    addTearDown(() => Process.run('chmod', ['755', locked.path]));
+
+    // * Root reads it anyway, so only the songs around it are certain
+    final songs = await library().songs();
+    expect(songs.map((s) => s.fileName),
+        containsAll(['sine.flac', 'sine_vbr.mp3', 'sine.m4a']));
+  }, skip: Platform.isWindows);
+
   test('keeps the folders the user picked', () async {
     final settings = File('${dir.path}/folders.json');
     final other = await Directory('${dir.path}/Other').create();
